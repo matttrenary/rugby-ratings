@@ -22,32 +22,29 @@ def parse_arguments():
     args = parser.parse_args()
     return args
 
-def generate_site(code):
+def generate_site(data_file, template_file):
     """Generate site in local directory"""
     print("Process data and build site")
 
     template_loader = jinja2.FileSystemLoader(searchpath="./")
     template_env = jinja2.Environment(loader=template_loader)
-    template = template_env.get_template("template.html")
+    template = template_env.get_template(template_file)
 
-    fname = 'Ratings' + code + '.csv'
-    with open(fname) as csv_file:
+    with open(data_file) as csv_file:
         csv_reader = csv.DictReader(csv_file)
         data = [row for row in csv_reader]
 
     output = template.render(data=data)
 
-    page = code + '.html'
+    page = data_file.replace('.csv','.html')
     with open(page, "w") as f:
         f.write(output)
-
 
 def deploy_site(page):
     """Deploy site S3 bucket"""
     print("Upload data to S3")
     session = boto3.Session(profile_name=AWS_PROFILE)
     s3 = session.resource("s3")
-    page = page + '.html'
     s3.Bucket(BUCKET).upload_file(
         Filename=page, Key=page, ExtraArgs={"ContentType": "text/html"}
     )
@@ -57,11 +54,11 @@ def main(args):
 
     code = args.code
     if code == '15s' or code == 'both':
-        generate_site('15s')
-        deploy_site('15s')
+        generate_site('Ratings15s.csv', 'ratings_template.html')
+        deploy_site('Ratings15s.html')
     if code == '7s' or code == 'both':
-        generate_site('7s')
-        deploy_site('7s')
+        generate_site('Ratings7s.csv', 'ratings_template.html')
+        deploy_site('Ratings7s.html')
     pass
 
 if __name__ == "__main__":
