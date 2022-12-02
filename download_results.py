@@ -5,8 +5,7 @@ Created on Wed Nov 23 21:32:56 2022
 @author: trenary
 """
 import argparse
-import csv
-
+import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -44,9 +43,11 @@ def download_results(code):
 
     print(f"Downloading: {worksheet.title}")
     fname = worksheet.title + ".csv"
-    with open(fname, "w") as f:
-        writer = csv.writer(f)
-        writer.writerows(sheet_values)
+    df = pd.DataFrame(sheet_values)
+    # Handle initial columns being numeric index
+    df.columns = df.iloc[0]
+    df = df.drop(0)
+    df.to_csv(fname, index=False)
 
 def main(args):
     print(f"### Downloading results: {args.code} ###")
