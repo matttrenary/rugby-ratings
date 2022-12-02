@@ -55,7 +55,9 @@ def load_results(code):
     df = format_ratings(df, 'rn1', False)
     df = format_ratings(df, 'rn2', False)
     df['adjust1'] = df.rn1-df.elo1
+    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if x<1 else '+' + str(x))
     df['adjust2'] = df.rn2-df.elo2
+    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if x<1 else '+' + str(x))
 
     return teams, df
 

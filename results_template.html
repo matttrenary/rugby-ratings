@@ -55,16 +55,16 @@
                 <tbody>
                 {% for row in data %}
                 <tr>
-                    <td>{{ row["elo1"] }}</td>
-                    <td>{{ row["adjust1"] }}</td>
-                    <td>{{ row["Team1"] }}</td>
-                    <td>{{ row["Score1"] }}</td>
-                    <td>-</td>
-                    <td>{{ row["Score2"] }}</td>
-                    <td>{{ row["Team2"] }}</td>
-                    <td>{{ row["adjust2"] }}</td>
-                    <td>{{ row["elo2"] }}</td>
-                    <td>{{ row["neutral"] }}</td>
+                    <td style="text-align: right">{{ row["elo1"] }}</td>
+                    <td style="text-align: right">{{ row["adjust1"] }}</td>
+                    <td style="text-align: right">{{ row["Team1"] }}</td>
+                    <td style="text-align: right">{{ row["Score1"] }}</td>
+                    <td style="text-align: center">-</td>
+                    <td style="text-align: left">{{ row["Score2"] }}</td>
+                    <td style="text-align: left">{{ row["Team2"] }}</td>
+                    <td style="text-align: left">{{ row["adjust2"] }}</td>
+                    <td style="text-align: left">{{ row["elo2"] }}</td>
+                    <td>{{ row["Neutral"] }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
