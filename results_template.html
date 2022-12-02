@@ -15,8 +15,10 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav mx-auto">
             <a class="navbar-brand" href="index.html">Home</a>
-            <a class="navbar-brand" href="Ratings15s.html">15s</a>
-            <a class="navbar-brand" href="Ratings7s.html">7s</a>
+            <a class="navbar-brand" href="Ratings15s.html">15s Ratings</a>
+            <a class="navbar-brand" href="Results15s.html">15s Results</a>
+            <a class="navbar-brand" href="Ratings7s.html">7s Ratings</a>
+            <a class="navbar-brand" href="Results7s.html">7s Results</a>
         </div>
     </div>
 </nav>
@@ -39,15 +41,16 @@
             <table class="table table-hover">
                 <thead class="table-dark">
                 <tr>
-                    <th scope="col">Rating</th>
-                    <th scope="col">Adjustment</th>
-                    <th scope="col">Home</th>
-                    <th scope="col">&nbsp;</th>
-                    <th scope="col">&nbsp;</th>
-                    <th scope="col">&nbsp;</th>
-                    <th scope="col">Away</th>
-                    <th scope="col">Adjustment</th>
-                    <th scope="col">Rating</th>
+                    <th scope="col">Date</th>
+                    <th scope="col" style="text-align: right">Rating</th>
+                    <th scope="col" style="text-align: right">Adjustment</th>
+                    <th scope="col" style="text-align: right">Home</th>
+                    <th scope="col" style="text-align: right">&nbsp;</th>
+                    <th scope="col" style="text-align: center">&nbsp;</th>
+                    <th scope="col" style="text-align: left">&nbsp;</th>
+                    <th scope="col" style="text-align: left">Away</th>
+                    <th scope="col" style="text-align: left">Adjustment</th>
+                    <th scope="col" style="text-align: left">Rating</th>
                     <th scope="col">Neutral</th>
 
                 </tr>
@@ -55,6 +58,7 @@
                 <tbody>
                 {% for row in data %}
                 <tr>
+                    <td>{{ row["Date"] }}</td>
                     <td style="text-align: right">{{ row["elo1"] }}</td>
                     <td style="text-align: right">{{ row["adjust1"] }}</td>
                     <td style="text-align: right">{{ row["Team1"] }}</td>
