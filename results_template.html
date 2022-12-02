@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/main.css" rel="stylesheet">
+    <title>College Rugby Ratings</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light"">
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav mx-auto">
+            <a class="navbar-brand" href="index.html">Home</a>
+            <a class="navbar-brand" href="Ratings15s.html">15s</a>
+            <a class="navbar-brand" href="Ratings7s.html">7s</a>
+        </div>
+    </div>
+</nav>
+
+<header id="header">
+    <div class="container text-center">
+        <h1 class="pt-5 pb-1 font-weight-bold">
+            College Rugby Ratings
+        </h1>
+        <hr>
+        <p class="pt-2">
+            Game Results
+        </p>
+    </div>
+</header>
+
+<section id="ratings_table">
+    <div class="container py-4">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Adjustment</th>
+                    <th scope="col">Home</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">Away</th>
+                    <th scope="col">Adjustment</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Neutral</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row["elo1"] }}</td>
+                    <td>{{ row["adjust1"] }}</td>
+                    <td>{{ row["Team1"] }}</td>
+                    <td>{{ row["Score1"] }}</td>
+                    <td>-</td>
+                    <td>{{ row["Score2"] }}</td>
+                    <td>{{ row["Team2"] }}</td>
+                    <td>{{ row["adjust2"] }}</td>
+                    <td>{{ row["elo2"] }}</td>
+                    <td>{{ row["neutral"] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

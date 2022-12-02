@@ -55,9 +55,11 @@ def main(args):
     code = args.code
     if code == '15s' or code == 'both':
         generate_site('Ratings15s.csv', 'ratings_template.html')
+        generate_site('Results15s.csv', 'results_template.html')
         deploy_site('Ratings15s.html')
     if code == '7s' or code == 'both':
         generate_site('Ratings7s.csv', 'ratings_template.html')
+        generate_site('Results7s.csv', 'results_template.html')
         deploy_site('Ratings7s.html')
     pass
 

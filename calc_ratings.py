@@ -45,8 +45,19 @@ def load_results(code):
     for index, row in df.iterrows():
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
         calculate_elo(game, teams)
+        update_results(df, index, game)
 
-    return format_ratings(teams)
+    teams = format_ratings(teams)
+    df.Score1 = df.Score1.astype(int)
+    df.Score2 = df.Score2.astype(int)
+    df = format_ratings(df, 'elo1', False)
+    df = format_ratings(df, 'elo2', False)
+    df = format_ratings(df, 'rn1', False)
+    df = format_ratings(df, 'rn2', False)
+    df['adjust1'] = df.rn1-df.elo1
+    df['adjust2'] = df.rn2-df.elo2
+
+    return teams, df
 
 def calculate_elo(game, teams):
     # Elo coefficients
@@ -56,11 +67,11 @@ def calculate_elo(game, teams):
         game.home_coef = 75
 
     print(f"{game.team1} vs {game.team2}")
-    elo1 = teams.loc[game.team1, 'Elo']
-    elo2 = teams.loc[game.team2, 'Elo']
-    print(f"{elo1} vs {elo2}")
-    rdiff1 = elo2 - (elo1 + game.home_coef)
-    rdiff2 = (elo1 + game.home_coef) - elo2
+    game.elo1 = teams.loc[game.team1, 'Elo']
+    game.elo2 = teams.loc[game.team2, 'Elo']
+    print(f"{game.elo1} vs {game.elo2}")
+    rdiff1 = game.elo2 - (game.elo1 + game.home_coef)
+    rdiff2 = (game.elo1 + game.home_coef) - game.elo2
     print(f"Ratings diff of {rdiff1}")
     we1 = 1/(10**(rdiff1/400)+1)
     we2 = 1/(10**(rdiff2/400)+1)
@@ -68,18 +79,25 @@ def calculate_elo(game, teams):
     print(f"win2 {game.win2}")
     print(f"we1 {we1}")
     print(f"we2 {we2}")
-    rn1 = elo1 + k*margin_coef*(game.win1-we1)
-    rn2 = elo2 + k*margin_coef*(game.win2-we2)
+    game.rn1 = game.elo1 + k*margin_coef*(game.win1-we1)
+    game.rn2 = game.elo2 + k*margin_coef*(game.win2-we2)
 
-    print(f"Assigning {game.team1} to {rn1}")
-    print(f"Assigning {game.team2} to {rn2}")
-    teams.loc[game.team1, 'Elo'] = rn1
-    teams.loc[game.team2, 'Elo'] = rn2
+    print(f"Assigning {game.team1} to {game.rn1}")
+    print(f"Assigning {game.team2} to {game.rn2}")
+    teams.loc[game.team1, 'Elo'] = game.rn1
+    teams.loc[game.team2, 'Elo'] = game.rn2
 
-def format_ratings(df, rating='Elo'):
+def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
-    df = df.sort_values(by=rating, ascending=False).copy()
+    if sort:
+        df = df.sort_values(by=rating, ascending=False).copy()
     return df
+
+def update_results(df, index, game):
+        df.loc[index, 'elo1'] = game.elo1
+        df.loc[index, 'elo2'] = game.elo2
+        df.loc[index, 'rn1'] = game.rn1
+        df.loc[index, 'rn2'] = game.rn2
 
 class Game:
     def __init__(self, team1, score1, team2, score2, neutral, additional):
@@ -112,11 +130,13 @@ def main(args):
 
     code = args.code
     if code == '15s' or code == 'both':
-        results = load_results('15s')
-        results.to_csv('Ratings15s.csv')
+        calcs = load_results('15s')
+        calcs[0].to_csv('Ratings15s.csv')
+        calcs[1].to_csv('Results15s.csv')
     if code == '7s' or code == 'both':
-        results = load_results('7s')
-        results.to_csv('Ratings7s.csv')
+        calcs = load_results('7s')
+        calcs[0].to_csv('Ratings7s.csv')
+        calcs[1].to_csv('Results7s.csv')
     pass
 
 if __name__ == "__main__":
