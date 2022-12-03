@@ -1,11 +1,7 @@
 import argparse
 import csv
 
-import boto3
 import jinja2
-
-AWS_PROFILE = "matt"
-BUCKET = "rugby-ratings"
 
 def parse_arguments():
     """Parse arguments when executed from CLI"""
@@ -40,15 +36,6 @@ def generate_site(data_file, template_file):
     with open(page, "w") as f:
         f.write(output)
 
-def deploy_site(page):
-    """Deploy site S3 bucket"""
-    print("Upload data to S3")
-    session = boto3.Session(profile_name=AWS_PROFILE)
-    s3 = session.resource("s3")
-    s3.Bucket(BUCKET).upload_file(
-        Filename=page, Key=page, ExtraArgs={"ContentType": "text/html"}
-    )
-
 def main(args):
     print(f"### Calculating results: {args.code} ###")
 
@@ -56,11 +43,9 @@ def main(args):
     if code == '15s' or code == 'both':
         generate_site('Ratings15s.csv', 'ratings_template.html')
         generate_site('Results15s.csv', 'results_template.html')
-        deploy_site('Ratings15s.html')
     if code == '7s' or code == 'both':
         generate_site('Ratings7s.csv', 'ratings_template.html')
         generate_site('Results7s.csv', 'results_template.html')
-        deploy_site('Ratings7s.html')
     pass
 
 if __name__ == "__main__":
