@@ -51,10 +51,10 @@ def generate_teams():
 
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
-        body15s = generate_from_df(games15s, "_results_table.html", title='15s Results')
+        body15s = generate_from_df(games15s, "_results_table.html", title=f'{row.Team} 15s Results')
 
         games7s = df7s[(df7s.Team1==row.Team) | (df7s.Team2==row.Team)].copy()
-        body7s = generate_from_df(games7s, "_results_table.html", title='7s Results')
+        body7s = generate_from_df(games7s, "_results_table.html", title=f'{row.Team} 7s Results')
 
         content = body15s + body7s
         content = generate_page(content, 'base_template.html')
