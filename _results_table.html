@@ -1,0 +1,40 @@
+<h2>{{ title }}</h2}
+    <div class="container py-4">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col" style="text-align: right">Rating</th>
+                    <th scope="col" style="text-align: right">Adjustment</th>
+                    <th scope="col" style="text-align: right">Home</th>
+                    <th scope="col" style="text-align: right">&nbsp;</th>
+                    <th scope="col" style="text-align: center">&nbsp;</th>
+                    <th scope="col" style="text-align: left">&nbsp;</th>
+                    <th scope="col" style="text-align: left">Away</th>
+                    <th scope="col" style="text-align: left">Adjustment</th>
+                    <th scope="col" style="text-align: left">Rating</th>
+                    <th scope="col">Neutral</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row["Date"] }}</td>
+                    <td style="text-align: right">{{ row["elo1"] }}</td>
+                    <td style="text-align: right">{{ row["adjust1"] }}</td>
+                    <td style="text-align: right"><a href='/teams/{{ row["Team1Link"] }}.html'>{{ row["Team1"] }}</a></td>
+                    <td style="text-align: right">{{ row["Score1"] }}</td>
+                    <td style="text-align: center">-</td>
+                    <td style="text-align: left">{{ row["Score2"] }}</td>
+                    <td style="text-align: left"><a href='/teams/{{ row["Team2Link"] }}.html'>{{ row["Team2"] }}</a></td>
+                    <td style="text-align: left">{{ row["adjust2"] }}</td>
+                    <td style="text-align: left">{{ row["elo2"] }}</td>
+                    <td>{{ row["Neutral"] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>

@@ -40,6 +40,7 @@ def load_results(code):
     teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
     teams = teams.drop_duplicates()
     teams['Elo'] = 1500
+    teams['TeamLink'] = team_link(teams.Team)
     teams = teams.set_index('Team')
 
     for index, row in df.iterrows():
@@ -48,16 +49,7 @@ def load_results(code):
         update_results(df, index, game)
 
     teams = format_ratings(teams)
-    df.Score1 = df.Score1.astype(int)
-    df.Score2 = df.Score2.astype(int)
-    df = format_ratings(df, 'elo1', False)
-    df = format_ratings(df, 'elo2', False)
-    df = format_ratings(df, 'rn1', False)
-    df = format_ratings(df, 'rn2', False)
-    df['adjust1'] = df.rn1-df.elo1
-    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if x<1 else '+' + str(x))
-    df['adjust2'] = df.rn2-df.elo2
-    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if x<1 else '+' + str(x))
+    df = format_results(df)
 
     return teams, df
 
@@ -89,17 +81,38 @@ def calculate_elo(game, teams):
     teams.loc[game.team1, 'Elo'] = game.rn1
     teams.loc[game.team2, 'Elo'] = game.rn2
 
+def update_results(df, index, game):
+        df.loc[index, 'elo1'] = game.elo1
+        df.loc[index, 'elo2'] = game.elo2
+        df.loc[index, 'rn1'] = game.rn1
+        df.loc[index, 'rn2'] = game.rn2
+
 def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
     if sort:
         df = df.sort_values(by=rating, ascending=False).copy()
     return df
 
-def update_results(df, index, game):
-        df.loc[index, 'elo1'] = game.elo1
-        df.loc[index, 'elo2'] = game.elo2
-        df.loc[index, 'rn1'] = game.rn1
-        df.loc[index, 'rn2'] = game.rn2
+def format_results(df):
+    df.Score1 = df.Score1.astype(int)
+    df.Score2 = df.Score2.astype(int)
+    df = format_ratings(df, 'elo1', False)
+    df = format_ratings(df, 'elo2', False)
+    df = format_ratings(df, 'rn1', False)
+    df = format_ratings(df, 'rn2', False)
+    df['adjust1'] = df.rn1-df.elo1
+    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if x<1 else '+' + str(x))
+    df['adjust2'] = df.rn2-df.elo2
+    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if x<1 else '+' + str(x))
+    df['Team1Link'] = team_link(df.Team1)
+    df['Team2Link'] = team_link(df.Team2)
+
+    return df
+
+def team_link(series):
+    series = series.str.lower().str.replace(' ','').str.replace("'",'')
+    series = series.str.replace('&','').str.replace('(','').str.replace(')','')
+    return series
 
 class Game:
     def __init__(self, team1, score1, team2, score2, neutral, additional):
@@ -139,7 +152,6 @@ def main(args):
         calcs = load_results('7s')
         calcs[0].to_csv('Ratings7s.csv')
         calcs[1].to_csv('Results7s.csv')
-    pass
 
 if __name__ == "__main__":
     arguments = parse_arguments()
