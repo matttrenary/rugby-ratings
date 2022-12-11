@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 import csv
 import pandas as pd
 import jinja2
@@ -39,7 +40,10 @@ def generate_page(content, template_file, **kwargs):
     template_env = jinja2.Environment(loader=template_loader)
     template = template_env.get_template(template_file)
 
-    return(template.render(data=content, **kwargs))
+    now = datetime.now()
+    now = now.strftime("%H:%M %h %d %Y")
+
+    return(template.render(data=content, timestamp=now, **kwargs))
 
 def generate_teams():
     team15s = pd.read_csv('Ratings15s.csv', header = 0)
