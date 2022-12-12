@@ -50,8 +50,8 @@ def generate_teams():
     team7s = pd.read_csv('Ratings7s.csv', header = 0)
     teams = pd.concat([team15s, team7s]).drop_duplicates()
 
-    df7s = pd.read_csv('Results7s.csv', header = 0)
-    df15s = pd.read_csv('Results15s.csv', header = 0)
+    df7s = pd.read_csv('Results7s.csv', header = 0).fillna('')
+    df15s = pd.read_csv('Results15s.csv', header = 0).fillna('')
 
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
