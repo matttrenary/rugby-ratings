@@ -43,6 +43,43 @@
         </ul>
     </div>
 </nav>
+    
+    <h2>Read this first</h2>
+    <ul>
+        <li><b>Midwest/East bias:</b> This site's results date back to August 2021 and include more 15s games for teams in the Midwest/East. More games mean more wins by
+            the top teams mean higher ratings for those teams. Expect the top west coast teams to rise during spring 2023 play. This seasonal bias will likely be
+            negligible in a year's time.
+        </li>
+        <li><b>Men's D1:</b> This site is focused on Division 1 Men's Collegiate Rugby. Games by Division 1 teams against opponents in other divisions are included.
+            Non first side games are not included.
+        </li>
+    </ul>
+    
+    <h2>Rating overview</h2>
+    <p>
+    This site uses an <a href='https://en.wikipedia.org/wiki/Elo_rating_system' target='_blank'>Elo rating system</a>. Elo was started for chess and has been
+    adopted for a variety of sports, including rugby.
+    <a href='https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/' target='_blank'>
+    This research project</a> explains this site's Elo implementation. Additionally, code for this site is <a href='https://github.com/matttrenary/rugby-ratings' target='_blank'>
+    available on GitHub</a>.
+    </p>
+    <p>
+    The primary features of an Elo system are:
+    <ul>
+        <li>Teams gain rating points by winning, and lose rating points by losing</li>
+        <li>The gained and lost rating points are equal; it's an exchange of points</li>
+        <li>Teams gain more when beating higher rated teams, and gain fewer when beating lower rated teams. Vice versa with losing.</li>
+        <li>Margin of victory impacts the points gained or lost, but the impact tapers off as the margin increases.</li>
+        <li>Home victories earn fewer rating points than away victories. Vice versa with losing.</li>
+    </ul>
+    </p>
+    
+    <h2>Cautions in use</h2>
+    <p>
+    Like any rating system, the more games played, and the greater variety of opponents, the more accurate the system will be. 15s rugby tends to have a relatively
+    low number of games, often against a small pool of opponents (the team's conference). The ratings for teams who play in a conference with very few
+    out-of-conference games should be used with less confidence than teams with a wider variety of opponents.
+    </p>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
