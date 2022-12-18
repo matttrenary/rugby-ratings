@@ -56,30 +56,35 @@ def load_results(code):
 def calculate_elo(game, teams):
     # Elo coefficients
     k = 40
-    margin_coef = np.log(game.margin + 1)
+    x = 2 if game.margin == 0 else 1
+    margin_coef = np.log(game.margin + x)
     if game.neutral != 'Yes':
         game.home_coef = 75
 
-    print(f"{game.team1} vs {game.team2}")
     game.elo1 = teams.loc[game.team1, 'Elo']
     game.elo2 = teams.loc[game.team2, 'Elo']
-    print(f"{game.elo1} vs {game.elo2}")
-    rdiff1 = game.elo2 - (game.elo1 + game.home_coef)
-    rdiff2 = (game.elo1 + game.home_coef) - game.elo2
-    print(f"Ratings diff of {rdiff1}")
-    we1 = 1/(10**(rdiff1/400)+1)
-    we2 = 1/(10**(rdiff2/400)+1)
-    print(f"win1 {game.win1}")
-    print(f"win2 {game.win2}")
-    print(f"we1 {we1}")
-    print(f"we2 {we2}")
-    game.rn1 = game.elo1 + k*margin_coef*(game.win1-we1)
-    game.rn2 = game.elo2 + k*margin_coef*(game.win2-we2)
 
-    print(f"Assigning {game.team1} to {game.rn1}")
-    print(f"Assigning {game.team2} to {game.rn2}")
+    # Auto correlation coefficient
+    game.autocor = autocor(game)
+
+    rdiff = game.elo2 - (game.elo1 + game.home_coef)
+    we = 1/(10**(rdiff/400)+1)
+    rating_change = k*margin_coef*game.autocor*(game.win1-we)
+
+    game.rn1 = game.elo1 + rating_change
+    game.rn2 = game.elo2 - rating_change
+
     teams.loc[game.team1, 'Elo'] = game.rn1
     teams.loc[game.team2, 'Elo'] = game.rn2
+
+def autocor(game):
+    if game.win1 == 1:
+        autocor = 2.2/((game.elo1-game.elo2)*.001+2.2)
+    elif game.win2 == 1:
+        autocor = 2.2/((game.elo2-game.elo1)*.001+2.2)
+    else:
+        autocor = 0
+    return autocor
 
 def update_results(df, index, game):
         df.loc[index, 'elo1'] = game.elo1
@@ -110,8 +115,12 @@ def format_results(df):
     return df
 
 def team_link(series):
-    series = series.str.lower().str.replace(' ','').str.replace("'",'')
-    series = series.str.replace('&','').str.replace('(','').str.replace(')','')
+    series = series.str.lower()
+    series = series.str.replace(' ','', regex=False)
+    series = series.str.replace("'",'', regex=False)
+    series = series.str.replace('&','', regex=False)
+    series = series.str.replace('(','', regex=False)
+    series = series.str.replace(')','', regex=False)
     return series
 
 class Game:
