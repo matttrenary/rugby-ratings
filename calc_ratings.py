@@ -69,10 +69,12 @@ def calculate_elo(game, teams):
 
     rdiff = game.elo2 - (game.elo1 + game.home_coef)
     we = 1/(10**(rdiff/400)+1)
-    rating_change = k*margin_coef*game.autocor*(game.win1-we)
 
-    game.rn1 = game.elo1 + rating_change
-    game.rn2 = game.elo2 - rating_change
+    game.adjust1 = k*margin_coef*game.autocor*(game.win1-we)
+    game.adjust2 = -1*game.adjust1
+
+    game.rn1 = game.elo1 + game.adjust1
+    game.rn2 = game.elo2 + game.adjust2
 
     teams.loc[game.team1, 'Elo'] = game.rn1
     teams.loc[game.team2, 'Elo'] = game.rn2
@@ -83,14 +85,16 @@ def autocor(game):
     elif game.win2 == 1:
         autocor = 2.2/((game.elo2-game.elo1)*.001+2.2)
     else:
-        autocor = 0
+        autocor = 1
     return autocor
 
 def update_results(df, index, game):
-        df.loc[index, 'elo1'] = game.elo1
-        df.loc[index, 'elo2'] = game.elo2
-        df.loc[index, 'rn1'] = game.rn1
-        df.loc[index, 'rn2'] = game.rn2
+    df.loc[index, 'elo1'] = game.elo1
+    df.loc[index, 'elo2'] = game.elo2
+    df.loc[index, 'rn1'] = game.rn1
+    df.loc[index, 'rn2'] = game.rn2
+    df.loc[index, 'adjust1'] = game.adjust1
+    df.loc[index, 'adjust2'] = game.adjust2
 
 def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
@@ -105,9 +109,9 @@ def format_results(df):
     df = format_ratings(df, 'elo2', False)
     df = format_ratings(df, 'rn1', False)
     df = format_ratings(df, 'rn2', False)
-    df['adjust1'] = df.rn1-df.elo1
+    df = format_ratings(df, 'adjust1', False)
+    df = format_ratings(df, 'adjust2', False)
     df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if x<1 else '+' + str(x))
-    df['adjust2'] = df.rn2-df.elo2
     df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if x<1 else '+' + str(x))
     df['Team1Link'] = team_link(df.Team1)
     df['Team2Link'] = team_link(df.Team2)
