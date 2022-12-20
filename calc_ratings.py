@@ -81,9 +81,9 @@ def calculate_elo(game, teams):
 
 def autocor(game):
     if game.win1 == 1:
-        autocor = 2.2/((game.elo1-game.elo2)*.001+2.2)
+        autocor = 2.2/(((game.elo1+game.home_coef)-game.elo2)*.001+2.2)
     elif game.win2 == 1:
-        autocor = 2.2/((game.elo2-game.elo1)*.001+2.2)
+        autocor = 2.2/((game.elo2-(game.elo1+game.home_coef))*.001+2.2)
     else:
         autocor = 1
     return autocor
