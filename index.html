@@ -47,12 +47,11 @@
 <div class='container'>
     <h2>Read this first</h2>
     <ul>
-        <li><b>Midwest/East bias:</b> This site's results date back to August 2021 and include more 15s games for teams in the Midwest/East. More games mean more wins by
-            the top teams mean higher ratings for those teams. Expect the top west coast teams to rise during spring 2023 play. This seasonal bias will likely be
-            negligible in a year's time.
+        <li><b>Regional bias:</b> This site's results date back to August 2021 and include two seasons of 15s games for teams in the Midwest/East, and 1.5 seasons of 7s games for teams in the West/South. More games mean more wins by
+            the top teams mean higher ratings for those teams. Expect the top West/South 15s teams and the top Midwest/East 7s teams to rise during spring 2023 play. This seasonal bias should be negligible after another season.
         </li>
         <li><b>Men's D1:</b> This site is focused on Division 1 Men's Collegiate Rugby. Games by Division 1 teams against opponents in other divisions are included.
-            Non first side games are not included.
+            Non first side games and shortened games are not included.
         </li>
     </ul>
     
@@ -61,7 +60,7 @@
     This site uses an <a href='https://en.wikipedia.org/wiki/Elo_rating_system' target='_blank'>Elo rating system</a>. Elo was started for chess and has been
     adopted for a variety of sports, including rugby.
     <a href='https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/' target='_blank'>
-    This research project</a> explains this site's Elo implementation. Additionally, code for this site is <a href='https://github.com/matttrenary/rugby-ratings' target='_blank'>
+    This research project</a> and <a href='https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/' target='_blank'>538's NFL Prediction detail</a> explain this site's Elo implementation. Additionally, code for this site is <a href='https://github.com/matttrenary/rugby-ratings' target='_blank'>
     available on GitHub</a>.
     </p>
     <p>
@@ -73,6 +72,7 @@
         <li>Margin of victory impacts the points gained or lost, but the impact tapers off as the margin increases.</li>
         <li>Home victories earn fewer rating points than away victories. Vice versa with losing.</li>
     </ul>
+    All teams start at 1500
     </p>
     
     <h2>Cautions in use</h2>
@@ -81,6 +81,30 @@
     low number of games, often against a small pool of opponents (the team's conference). The ratings for teams who play in a conference with very few
     out-of-conference games should be used with less confidence than teams with a wider variety of opponents.
     </p>
+    
+    <h2>Missing games and scores</h2>
+    Let's just say college rugby teams aren't great at publishing scores. Scores and games are definitely missing here, and if you have info to add or correct, please use the form below.
+    
+    <script type="text/javascript">var submitted=false;</script>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thankyou.html';}"></iframe>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLScoV3mKp2o0fA3sPjCw4pquEeX_bVpjphrX4G3LKusC4tdbnQ/formResponse" method="post" target="hidden_iframe" onsubmit="submitted=true;">
+          <input type="text" size="35" placeholder="Name*" name="entry.2091320745" required />
+          <br>
+          <input type="text" size="35" placeholder="Email*" name="entry.246779433" required />
+          <br>
+          <textarea rows="5" cols="37" placeholder="Game, score, or suggestion*" name="entry.962901770" required></textarea>
+          <br>
+          <button type="submit">Submit</button>
+    </form>
+    
+    <h2>Expected updates</h2>
+    <ul>
+        <li>The creation of a <a href='https://www.uscho.com/faq/pairwise-rankings-explanation/' target='_blank'>pairwise ranking as in college hockey</a>. This emphasizes head-to-head victories to help determine which teams are "most deserving" of playoff selection.
+        <li>UX and navigational improvements
+    </ul>
+    
+    <h2>Who runs this?</h2>
+    Matt Trenary and George Janke, along with others involved with University of Michigan rugby. This site's code and updates are public to eliminate any fear of favoring Michigan.
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
