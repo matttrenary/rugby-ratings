@@ -55,13 +55,20 @@ def generate_teams():
 
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
-        body15s = generate_from_df(games15s, "_results_table.html", title=f'{row.Team} 15s Results')
+        body15s = generate_from_df(games15s,
+                                   "_results_table.html",
+                                   title=f'{row.Team} 15s Results',
+                                   id='results15s',
+                                   active='show active')
 
         games7s = df7s[(df7s.Team1==row.Team) | (df7s.Team2==row.Team)].copy()
-        body7s = generate_from_df(games7s, "_results_table.html", title=f'{row.Team} 7s Results')
+        body7s = generate_from_df(games7s,
+                                  "_results_table.html",
+                                  title=f'{row.Team} 7s Results',
+                                  id='results7s')
 
         content = body15s + body7s
-        content = generate_page(content, 'base_template.html')
+        content = generate_page(content, 'team_template.html', content_title=row.Team)
 
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
@@ -75,22 +82,36 @@ def main(args):
 
     code = args.code
     if code == '15s' or code == 'both':
-        body = generate_from_csv('Ratings15s.csv', '_ratings_table.html')
-        content = generate_page(body, 'base_template.html')
-        save_page('Ratings15s.html', content)
+        body_ratings15s = generate_from_csv('Ratings15s.csv',
+                                            '_ratings_table.html',
+                                            id='ratings15s',
+                                            active='show active')
 
-        body = generate_from_csv('Results15s.csv', '_results_table.html')
-        content = generate_page(body, 'base_template.html')
-        save_page('Results15s.html', content)
+        body_results15s = generate_from_csv('Results15s.csv',
+                                            '_results_table.html',
+                                            id='results15s',
+                                            active='show active')
 
     if code == '7s' or code == 'both':
-        body = generate_from_csv('Ratings7s.csv', '_ratings_table.html')
-        content = generate_page(body, 'base_template.html')
-        save_page('Ratings7s.html', content)
+        body_ratings7s = generate_from_csv('Ratings7s.csv',
+                                           '_ratings_table.html',
+                                           id='ratings7s')
 
-        body = generate_from_csv('Results7s.csv', '_results_table.html')
-        content = generate_page(body, 'base_template.html')
-        save_page('Results7s.html', content)
+        body_results7s = generate_from_csv('Results7s.csv',
+                                           '_results_table.html',
+                                           id='results7s')
+    
+    body_results = body_results15s + body_results7s
+    content_results = generate_page(body_results,
+                                    'results_template.html',
+                                    content_title='Results')
+    save_page('results.html', content_results)
+
+    body_ratings = body_ratings15s + body_ratings7s
+    content_ratings = generate_page(body_ratings,
+                                    'ratings_template.html',
+                                    content_title='Ratings')
+    save_page('ratings.html', content_ratings)
 
     generate_teams()
 

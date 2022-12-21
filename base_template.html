@@ -21,16 +21,10 @@
             		<a class="nav-link" href="/rugby-ratings/index.html">Home</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Ratings15s.html">15s Ratings</a>
+            		<a class="nav-link" href="/rugby-ratings/ratings.html">Ratings</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Results15s.html">15s Results</a>
-            </li>
-            <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Ratings7s.html">7s Ratings</a>
-            </li>
-            <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Results7s.html">7s Results</a>
+            		<a class="nav-link" href="/rugby-ratings/results.html">Results</a>
             </li>
         </ul>
     </div>
@@ -44,11 +38,18 @@
     </div>
 </header>
 
+{% block content_title%}
+{% endblock %}
+
+{% block sub_nav %}{% endblock %}
+
+{% block content %}
+{{ data }}
+{% endblock %}
+
 <p>
 As of {{ timestamp }}
 </p>
-
-{{ data }}
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

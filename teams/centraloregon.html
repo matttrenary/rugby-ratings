@@ -21,16 +21,10 @@
             		<a class="nav-link" href="/rugby-ratings/index.html">Home</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Ratings15s.html">15s Ratings</a>
+            		<a class="nav-link" href="/rugby-ratings/ratings.html">Ratings</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Results15s.html">15s Results</a>
-            </li>
-            <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Ratings7s.html">7s Ratings</a>
-            </li>
-            <li class="nav-item">
-            		<a class="nav-link" href="/rugby-ratings/Results7s.html">7s Results</a>
+            		<a class="nav-link" href="/rugby-ratings/results.html">Results</a>
             </li>
         </ul>
     </div>
@@ -44,11 +38,27 @@
     </div>
 </header>
 
-<p>
-As of 08:58 Dec 21 2022
-</p>
 
-<h2>Central Oregon 15s Results</h2>
+<h2 class='text-center'>Central Oregon</h2>
+
+
+
+
+<ul class="nav nav-pills mb-3 nav-fill" id="pills-tab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="results15s-tab" data-toggle="pill" href="#results15s" role="tab" aria-controls="pills-results15s" aria-selected="true">15s Results</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="results7s-tab" data-toggle="pill" href="#results7s" role="tab" aria-controls="pills-results7s" aria-selected="false">7s Results</a>
+  </li>
+</ul>
+
+
+
+
+
+<div class="tab-content" id="pills-tabContent">
+<div class='tab-pane fade show active' id='results15s' role='tabpanel' aria-labelledby='results15s-tab'>
     <div class="container py-4">
         <div class="table-responsive">
             <table class="table table-hover">
@@ -115,7 +125,8 @@ As of 08:58 Dec 21 2022
                 </tbody>
             </table>
         </div>
-    </div><h2>Central Oregon 7s Results</h2>
+    </div>
+</div><div class='tab-pane fade ' id='results7s' role='tabpanel' aria-labelledby='results7s-tab'>
     <div class="container py-4">
         <div class="table-responsive">
             <table class="table table-hover">
@@ -141,6 +152,14 @@ As of 08:58 Dec 21 2022
             </table>
         </div>
     </div>
+</div>
+</div>
+
+
+
+<p>
+As of 15:56 Dec 21 2022
+</p>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

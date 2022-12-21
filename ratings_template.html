@@ -1,0 +1,26 @@
+{% extends 'base_template.html' %}
+
+{% block content_title%}
+<h2 class='text-center'>{{ content_title }}</h2>
+{% endblock %}
+
+{% block sub_nav %}
+
+<ul class="nav nav-pills mb-3 nav-fill" id="pills-tab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="ratings15s-tab" data-toggle="pill" href="#ratings15s" role="tab" aria-controls="pills-ratings15s" aria-selected="true">15s Ratings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="ratings7s-tab" data-toggle="pill" href="#ratings7s" role="tab" aria-controls="pills-ratings7s" aria-selected="false">7s Ratings</a>
+  </li>
+</ul>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="tab-content" id="pills-tabContent">
+{{ data }}
+</div>
+
+{% endblock %}
