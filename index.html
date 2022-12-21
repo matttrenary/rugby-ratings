@@ -84,16 +84,19 @@
     
     <h2>Missing games and scores</h2>
     Let's just say college rugby teams aren't great at publishing scores. Scores and games are definitely missing here, and if you have info to add or correct, please use the form below.
-    <form action="https://docs.google.com/forms/d/e/1FAIpQLScoV3mKp2o0fA3sPjCw4pquEeX_bVpjphrX4G3LKusC4tdbnQ/formResponse" method="post"
+    
+    <script type="text/javascript">var submitted=false;</script>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thankyou.html';}"></iframe>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLScoV3mKp2o0fA3sPjCw4pquEeX_bVpjphrX4G3LKusC4tdbnQ/formResponse" method="post" target="hidden_iframe" onsubmit="submitted=true;">
           <label>Name*</label>
           <input type="text" placeholder="Name*" name="entry.2091320745" required>
-    
+
           <label>Email*</label>
           <input type="text" placeholder="Email*" name="entry.246779433" required>
-          
+
           <label>Game, score, or suggestion*</label>
           <textarea rows="5" placeholder="Game, score, or suggestion*" name="entry.962901770" required></textarea>
-    
+
           <button type="submit">Submit</button>
     </form>
     
