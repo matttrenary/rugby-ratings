@@ -11,7 +11,7 @@
                 <tbody>
                 {% for row in data %}
                 <tr>
-                    <td><a href='/rugby-ratings/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
+                    <td><a href='/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
                     <td>{{ row["Elo"] }}</td>
                 </tr>
                 {% endfor %}
