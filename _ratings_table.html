@@ -4,6 +4,7 @@
             <table class="table table-hover">
                 <thead class="table-dark">
                 <tr>
+                    <th scope="col">Rank</th>
                     <th scope="col">Team</th>
                     <th scope="col">Rating</th>
                 </tr>
@@ -11,7 +12,8 @@
                 <tbody>
                 {% for row in data %}
                 <tr>
-                    <td><a href='/rugby-ratings/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
+                    <td>{{ row["Rank"] }}</td>
+                    <td><a href='/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
                     <td>{{ row["Elo"] }}</td>
                 </tr>
                 {% endfor %}

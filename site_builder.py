@@ -30,7 +30,7 @@ def generate_from_df(df, template_file, **kwargs):
     data = []
     for index, row in df.iterrows():
         data = data + [row.to_dict()]
-    
+
     return(generate_page(data, template_file, **kwargs))
 
 def generate_page(content, template_file, **kwargs):
@@ -55,6 +55,8 @@ def generate_teams():
 
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
+        games15s['adjust1'] = games15s['adjust1'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+        games15s['adjust2'] = games15s['adjust2'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
         body15s = generate_from_df(games15s,
                                    "_results_table.html",
                                    title=f'{row.Team} 15s Results',
@@ -62,6 +64,8 @@ def generate_teams():
                                    active='show active')
 
         games7s = df7s[(df7s.Team1==row.Team) | (df7s.Team2==row.Team)].copy()
+        games7s['adjust1'] = games7s['adjust1'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+        games7s['adjust2'] = games7s['adjust2'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
         body7s = generate_from_df(games7s,
                                   "_results_table.html",
                                   title=f'{row.Team} 7s Results',
@@ -100,17 +104,17 @@ def main(args):
         body_results7s = generate_from_csv('Results7s.csv',
                                            '_results_table.html',
                                            id='results7s')
-    
+
     body_results = body_results15s + body_results7s
     content_results = generate_page(body_results,
                                     'results_template.html',
-                                    content_title='Results')
+                                    content_title='Division 1 College Rugby Results')
     save_page('results.html', content_results)
 
     body_ratings = body_ratings15s + body_ratings7s
     content_ratings = generate_page(body_ratings,
                                     'ratings_template.html',
-                                    content_title='Ratings')
+                                    content_title='Division 1 College Rugby Ratings')
     save_page('ratings.html', content_ratings)
 
     generate_teams()

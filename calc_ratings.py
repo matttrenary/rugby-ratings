@@ -100,6 +100,7 @@ def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
     if sort:
         df = df.sort_values(by=rating, ascending=False).copy()
+    df['Rank'] = range(1, len(df) + 1)
     return df
 
 def format_results(df):
@@ -111,11 +112,13 @@ def format_results(df):
     df = format_ratings(df, 'rn2', False)
     df = format_ratings(df, 'adjust1', False)
     df = format_ratings(df, 'adjust2', False)
-    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if x<1 else '+' + str(x))
-    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if x<1 else '+' + str(x))
+    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
     df['Team1Link'] = team_link(df.Team1)
     df['Team2Link'] = team_link(df.Team2)
 
+    # Make it so that recent results show up before earlier ones
+    df = df.loc[::-1]
     return df
 
 def team_link(series):
@@ -160,7 +163,8 @@ def main(args):
     if code == '15s' or code == 'both':
         calcs = load_results('15s')
         calcs[0].to_csv('Ratings15s.csv')
-        calcs[1].to_csv('Results15s.csv')
+        # Somehow the Seq column was causing a Runtime Warning; worth investigating later
+        calcs[1].loc[:, calcs[1].columns != 'Seq'].to_csv('Results15s.csv')
     if code == '7s' or code == 'both':
         calcs = load_results('7s')
         calcs[0].to_csv('Ratings7s.csv')
