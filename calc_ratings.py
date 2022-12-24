@@ -43,6 +43,8 @@ def load_results(code):
     teams['TeamLink'] = team_link(teams.Team)
     teams = teams.set_index('Team')
 
+    teams = qualify_teams(teams, df)
+
     for index, row in df.iterrows():
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
         calculate_elo(game, teams)
@@ -52,6 +54,46 @@ def load_results(code):
     df = format_results(df)
 
     return teams, df
+
+def qualify_teams(teams, df):
+    # Tally each team's number of games
+    numGames = dict.fromkeys(list(teams.index.values), 0)
+    for index, row in df.iterrows():
+        numGames[row.Team1] = numGames[row.Team1] + 1
+        numGames[row.Team2] = numGames[row.Team2] + 1
+    # Remove teams with less than 5 games
+    numGames2 = numGames.copy()
+    for key, value in numGames.items():
+        if (value < 5):
+            numGames2.pop(key)
+    possible = numGames2
+    # Find teams without enough Connectivity
+    eligible = []
+    newEligible = []
+    newEligible.append(max(possible, key=possible.get))
+    possible.pop(newEligible[0])
+    while (len(newEligible) > 0):
+        eligible = eligible + newEligible
+        newEligible = []
+        possible = dict.fromkeys(possible, 0)
+        for index, row in df.iterrows():
+            if (row.Team1 in eligible) and (row.Team2 in possible):
+                possible[row.Team2] = possible[row.Team2] + 1
+            elif (row.Team2 in eligible) and (row.Team1 in possible):
+                possible[row.Team1] = possible[row.Team1] + 1
+        possible2 = possible.copy()
+        for key, value in possible.items():
+            # connectivity coefficient C=3
+            if (value >= 3):
+                newEligible.append(key)
+                possible2.pop(key)
+        possible = possible2
+    print("Eligible Teams: ", len(eligible))
+    # Add eligibility to teams dataframe
+    teams['Eligible'] = False
+    for team in eligible:
+        teams.loc[team, 'Eligible'] = True
+    return teams
 
 def calculate_elo(game, teams):
     # Elo coefficients

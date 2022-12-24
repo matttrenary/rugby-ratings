@@ -7,6 +7,7 @@
                     <th scope="col">Rank</th>
                     <th scope="col">Team</th>
                     <th scope="col">Rating</th>
+                    <th scope="col">Eligible</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -15,6 +16,7 @@
                     <td>{{ row["Rank"] }}</td>
                     <td><a href='/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
                     <td>{{ row["Elo"] }}</td>
+                    <td>{{ row["Eligible"] }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
