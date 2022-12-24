@@ -36,7 +36,7 @@ def generate_from_df(df, template_file, **kwargs):
 def generate_page(content, template_file, **kwargs):
     """Generate site in local directory"""
 
-    template_loader = jinja2.FileSystemLoader(searchpath="./")
+    template_loader = jinja2.FileSystemLoader(searchpath="./templates/")
     template_env = jinja2.Environment(loader=template_loader)
     template = template_env.get_template(template_file)
 

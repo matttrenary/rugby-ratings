@@ -1,11 +1,16 @@
 {% extends 'base_template.html' %}
 
+{% block title %}<title>{{ content_title }} - RugbyHawk</title>{% endblock %}
+
 {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
+  <a class="navbar-brand" href="#">
+    <img src="/rugby-ratings/assets/RugbyHawkRounded.svg" width="30" height="30" alt="">RugbyHawk
+  </a>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -24,7 +29,13 @@
 {% endblock %}
 
 {% block content_title%}
-<h2 class='text-center content-title'>{{ content_title }}</h2>
+<header id="header">
+    <div class="container text-center">
+        <h1 class="pt-5 pb-1 font-weight-bold">
+            {{ content_title }}
+        </h1>
+    </div>
+</header>
 {% endblock %}
 
 {% block sub_nav %}

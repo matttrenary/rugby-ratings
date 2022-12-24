@@ -1,21 +1,26 @@
 {% extends 'base_template.html' %}
 
+{% block title %}<title>{{ content_title }} - RugbyHawk</title>{% endblock %}
+
 {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
+  <a class="navbar-brand" href="#">
+    <img src="/rugby-ratings/assets/RugbyHawkRounded.svg" width="30" height="30" alt="">RugbyHawk
+  </a>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav">
             <li class="nav-item">
             		<a class="nav-link" href="/index.html">Home</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link" href="/ratings.html">Ratings</a>
+            		<a class="nav-link current" href="/ratings.html">Ratings</a>
             </li>
             <li class="nav-item">
-            		<a class="nav-link current" href="/results.html">Results</a>
+            		<a class="nav-link" href="/results.html">Results</a>
             </li>
         </ul>
     </div>
@@ -24,17 +29,23 @@
 {% endblock %}
 
 {% block content_title%}
-<h2 class='text-center content-title'>{{ content_title }}</h2>
+<header id="header">
+    <div class="container text-center">
+        <h1 class="pt-5 pb-1 font-weight-bold">
+            {{ content_title }}
+        </h1>
+    </div>
+</header>
 {% endblock %}
 
 {% block sub_nav %}
 
 <ul class="nav nav-pills mb-3 nav-fill" id="pills-tab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="results15s-tab" data-toggle="pill" href="#results15s" role="tab" aria-controls="pills-results15s" aria-selected="true">15s Results</a>
+    <a class="nav-link active" id="ratings15s-tab" data-toggle="pill" href="#ratings15s" role="tab" aria-controls="pills-ratings15s" aria-selected="true">15s Ratings</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="results7s-tab" data-toggle="pill" href="#results7s" role="tab" aria-controls="pills-results7s" aria-selected="false">7s Results</a>
+    <a class="nav-link" id="ratings7s-tab" data-toggle="pill" href="#ratings7s" role="tab" aria-controls="pills-ratings7s" aria-selected="false">7s Ratings</a>
   </li>
 </ul>
 
