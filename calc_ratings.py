@@ -31,7 +31,7 @@ def parse_arguments():
 
 def load_results(code):
     fname = code + '.csv'
-    df = pd.read_csv(fname)
+    df = pd.read_csv(fname, parse_dates=['Date'])
 
     # Only games with scores for both teams
     df = df[~(df.Score1.isnull()) & ~(df.Score2.isnull())].copy()
@@ -118,7 +118,9 @@ def format_results(df):
     df['Team2Link'] = team_link(df.Team2)
 
     # Make it so that recent results show up before earlier ones
-    df = df.loc[::-1]
+    df = df.sort_values(by=['Date','Seq'], ascending=[False,False])
+    df.Date = df.Date.dt.strftime('%b %#d, %Y')
+
     return df
 
 def team_link(series):
