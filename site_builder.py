@@ -86,9 +86,9 @@ def main(args):
 
     code = args.code
     if code == '15s' or code == 'both':
-        body_ratings15s = generate_from_csv('Ratings15s.csv',
-                                            '_ratings_table.html',
-                                            id='ratings15s',
+        body_rankings15s = generate_from_csv('Ratings15s.csv',
+                                            '_rankings_table.html',
+                                            id='rankings15s',
                                             active='show active')
 
         body_results15s = generate_from_csv('Results15s.csv',
@@ -97,9 +97,9 @@ def main(args):
                                             active='show active')
 
     if code == '7s' or code == 'both':
-        body_ratings7s = generate_from_csv('Ratings7s.csv',
-                                           '_ratings_table.html',
-                                           id='ratings7s')
+        body_rankings7s = generate_from_csv('Ratings7s.csv',
+                                           '_rankings_table.html',
+                                           id='rankings7s')
 
         body_results7s = generate_from_csv('Results7s.csv',
                                            '_results_table.html',
@@ -111,11 +111,11 @@ def main(args):
                                     content_title='Division 1 College Rugby Results')
     save_page('results.html', content_results)
 
-    body_ratings = body_ratings15s + body_ratings7s
-    content_ratings = generate_page(body_ratings,
-                                    'ratings_template.html',
-                                    content_title='Division 1 College Rugby Ratings')
-    save_page('ratings.html', content_ratings)
+    body_rankings = body_rankings15s + body_rankings7s
+    content_rankings = generate_page(body_rankings,
+                                    'rankings_template.html',
+                                    content_title='Division 1 College Rugby Rankings')
+    save_page('rankings.html', content_rankings)
 
     generate_teams()
 

@@ -72,6 +72,11 @@ nav li a.current:hover {
   margin-top: -30px;
 }
 
+/* Red line to separate rankings-eligible teams from the others */
+.eligibility-separator {
+  border-bottom: 2pt solid lightcoral !important;
+}
+
 /* What does this do? */
 .content-title {
   margin: 10px;

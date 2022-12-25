@@ -1,0 +1,39 @@
+<div class='tab-pane fade {{ active }}' id='{{ id }}' role='tabpanel' aria-labelledby='{{ id }}-tab'>
+    <div class="container py-4">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Team</th>
+                    <th scope="col" style="text-align: center">WLT</th>
+                    <th scope="col" style="text-align: center">ELO</th>
+                    <th scope="col" style="text-align: center">PWR</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in data %}
+                  {% if row["Pairwise"] == '0' and row["Eligible"] == 'True' %}
+                    <tr>
+                      <td class="eligibility-separator">{{ row["Rank"] }}</td>
+                      <td class="eligibility-separator"><a href='/teams/{{ row["TeamLink"] }}.html'
+                        >{{ row["Team"] }}</a></td>
+                      <td class="eligibility-separator" style="text-align: center">{{ row["WLT"] }}</td>
+                      <td class="eligibility-separator" style="text-align: center">{{ row["Elo"] }}</td>
+                      <td class="eligibility-separator" style="text-align: center">{{ row["Pairwise"] }}</td>
+                    </tr>
+                  {% else %}
+                    <tr>
+                      <td>{{ row["Rank"] }}</td>
+                      <td><a href='/teams/{{ row["TeamLink"] }}.html'>{{ row["Team"] }}</a></td>
+                      <td style="text-align: center">{{ row["WLT"] }}</td>
+                      <td style="text-align: center">{{ row["Elo"] }}</td>
+                      <td style="text-align: center">{{ row["Pairwise"] }}</td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
