@@ -15,12 +15,18 @@
                 {% for row in data %}
                   {% if row["Pairwise"] == '0' and row["Eligible"] == 'True' %}
                     <tr>
-                      <td class="eligibility-separator">{{ row["Rank"] }}</td>
-                      <td class="eligibility-separator"><a href='/teams/{{ row["TeamLink"] }}.html'
+                      <td>{{ row["Rank"] }}</td>
+                      <td><a href='/teams/{{ row["TeamLink"] }}.html'
                         >{{ row["Team"] }}</a></td>
-                      <td class="eligibility-separator" style="text-align: center">{{ row["WLT"] }}</td>
-                      <td class="eligibility-separator" style="text-align: center">{{ row["Elo"] }}</td>
-                      <td class="eligibility-separator" style="text-align: center">{{ row["Pairwise"] }}</td>
+                      <td style="text-align: center">{{ row["WLT"] }}</td>
+                      <td style="text-align: center">{{ row["Elo"] }}</td>
+                      <td style="text-align: center">{{ row["Pairwise"] }}</td>
+                    </tr>
+                    <tr>
+                      <td class="eligibility-separator" style="text-align: center" colspan="5">
+                        Teams below this line need more games to be eligible for PWR points. <a
+                          href="/index.html">Read more here.</a>
+                      </td>
                     </tr>
                   {% else %}
                     <tr>
@@ -32,6 +38,12 @@
                     </tr>
                   {% endif %}
                 {% endfor %}
+                <tr>
+                  <td style="text-align: center" colspan="5">
+                    Teams aren't displayed if they don't have any Division 1 games in our system. <a
+                      href="/index.html">Read more here.</a>
+                  </td>
+                </tr>
                 </tbody>
             </table>
         </div>

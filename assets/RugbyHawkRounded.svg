@@ -3,7 +3,10 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #fcfcfc;
+        fill: #f8f9fa;
+      }
+      #Layer_1-2 {
+        fill: #3b73b3;
       }
     </style>
   </defs>

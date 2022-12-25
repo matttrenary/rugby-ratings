@@ -14,7 +14,7 @@ nav * {
   font-size: 22px;
 }
 nav li a.current {
-  background-color: rgb(0 123 255);
+  background-color: #3b73b3 /* rgb(0 123 255) */;
   border-radius: 10%;
   color: white !important;
 }
@@ -25,11 +25,14 @@ nav li a.current:hover {
   font-size: 22px;
   padding-top: 6px;
   padding-bottom: 2px;
+  color: #3b73b3 !important;
+  font-weight: bold;
 }
 .navbar-brand img {
-  height: 41px;
+  height: 49px;
   margin-right: 8px;
   margin-top: -3px;
+  background-color: transparent;
 }
 
 /* Ensure that each page's title displays with appropriate spacing */
@@ -75,10 +78,53 @@ nav li a.current:hover {
 /* Red line to separate rankings-eligible teams from the others */
 .eligibility-separator {
   border-bottom: 2pt solid lightcoral !important;
+  background-color:
 }
 
 /* What does this do? */
 .content-title {
   margin: 10px;
   margin-bottom: 20px;
+}
+
+/* Change navlink active color */
+.nav-link.active {
+  background-color: #3b73b3 !important;
+  color: white !important;
+}
+.nav-link#rankings15s-tab {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: #f8f9fa;
+}
+.nav-link#rankings7s-tab {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: #f8f9fa;
+}
+.nav-link#results15s-tab {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: #f8f9fa;
+}
+.nav-link#results7s-tab {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: #f8f9fa;
+}
+.nav-link#rankings15s-tab:hover {
+  color: rgba(0, 0, 0, 1);
+  background-color: #f8f9fa;
+}
+.nav-link#rankings7s-tab:hover {
+  color: rgba(0, 0, 0, 1);
+  background-color: #f8f9fa;
+}
+.nav-link#results15s-tab:hover {
+  color: rgba(0, 0, 0, 1);
+  background-color: #f8f9fa;
+}
+.nav-link#results7s-tab:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+/* Make all links steel blue in order to match theme */
+a {
+  color: #3b73b3;
 }
