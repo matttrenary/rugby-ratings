@@ -41,7 +41,7 @@ def generate_page(content, template_file, **kwargs):
     template = template_env.get_template(template_file)
 
     now = datetime.now()
-    now = now.strftime("%H:%M %h %d, %Y")
+    now = now.strftime("%H:%M %h %-d, %Y")
 
     return(template.render(data=content, timestamp=now, **kwargs))
 

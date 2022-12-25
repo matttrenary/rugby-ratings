@@ -60,9 +60,9 @@ def load_results(code):
 def qualify_teams(teams, df):
     # Tally each team's number of games
     numGames = dict.fromkeys(list(teams.index.values), 0)
-    for index, row in df.iterrows():
-        numGames[row.Team1] = numGames[row.Team1] + 1
-        numGames[row.Team2] = numGames[row.Team2] + 1
+    for index in df.index:
+        numGames[df['Team1'][index]] = numGames[df['Team1'][index]] + 1
+        numGames[df['Team2'][index]] = numGames[df['Team2'][index]] + 1
     # Remove teams with less than 5 games
     numGames2 = numGames.copy()
     for key, value in numGames.items():
@@ -78,11 +78,11 @@ def qualify_teams(teams, df):
         eligible = eligible + newEligible
         newEligible = []
         possible = dict.fromkeys(possible, 0)
-        for index, row in df.iterrows():
-            if (row.Team1 in eligible) and (row.Team2 in possible):
-                possible[row.Team2] = possible[row.Team2] + 1
-            elif (row.Team2 in eligible) and (row.Team1 in possible):
-                possible[row.Team1] = possible[row.Team1] + 1
+        for index in df.index:
+            if (df['Team1'][index] in eligible) and (df['Team2'][index] in possible):
+                possible[df['Team2'][index]] = possible[df['Team2'][index]] + 1
+            elif (df['Team2'][index] in eligible) and (df['Team1'][index] in possible):
+                possible[df['Team1'][index]] = possible[df['Team1'][index]] + 1
         possible2 = possible.copy()
         for key, value in possible.items():
             # connectivity coefficient C=3
@@ -163,7 +163,7 @@ def format_results(df):
 
     # Make it so that recent results show up before earlier ones
     df = df.sort_values(by=['Date','Seq'], ascending=[False,False])
-    df.Date = df.Date.dt.strftime('%b %d, %Y')
+    df.Date = df.Date.dt.strftime('%b %-d, %Y')
 
     return df
 
