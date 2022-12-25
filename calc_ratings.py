@@ -44,6 +44,8 @@ def load_results(code):
     teams = teams.set_index('Team')
 
     teams = qualify_teams(teams, df)
+    # Set ineligible teams to a lower starting ELO
+    teams[~teams['Eligible']] = teams[~teams['Eligible']].assign(Elo=1300)
 
     for index, row in df.iterrows():
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
@@ -169,6 +171,7 @@ def team_link(series):
     series = series.str.lower()
     series = series.str.replace(' ','', regex=False)
     series = series.str.replace("'",'', regex=False)
+    series = series.str.replace('.','', regex=False)
     series = series.str.replace('&','', regex=False)
     series = series.str.replace('(','', regex=False)
     series = series.str.replace(')','', regex=False)
