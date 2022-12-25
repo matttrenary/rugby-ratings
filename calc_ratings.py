@@ -52,7 +52,13 @@ def load_results(code):
         calculate_elo(game, teams)
         update_results(df, index, game)
 
-    teams = format_ratings(teams)
+    teams['Pairwise'] = 0
+    teams['WLT'] = "0-0-0"
+    teams = calculate_pairwise(teams[teams['Eligible']], teams, df)
+
+    teams = format_ratings(teams, 'Elo')
+    teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
+    teams['Rank'] = range(1, len(teams) + 1)
     df = format_results(df)
 
     return teams, df
@@ -123,6 +129,74 @@ def calculate_elo(game, teams):
     teams.loc[game.team1, 'Elo'] = game.rn1
     teams.loc[game.team2, 'Elo'] = game.rn2
 
+def calculate_pairwise(teams, allTeams, df):
+    # Create matrix containing: teams > opponents > WLT vs that opponent
+    eligibleTeams = list(teams.index.values)
+    completeTeams = list(allTeams.index.values)
+    opponentsMatrix = {team: ({oppo: [0, 0, 0] for oppo in completeTeams}) for team in completeTeams}
+    # Create environment to track total WLT
+    for team in completeTeams:
+        opponentsMatrix[team]['TOTAL'] = [0, 0, 0]
+    for index in df.index:
+        score1 = df['Score1'][index]
+        score2 = df['Score2'][index]
+        team1 = df['Team1'][index]
+        team2 = df['Team2'][index]
+        if (score1 > score2):
+            opponentsMatrix[team1][team2][0] += 1
+            opponentsMatrix[team1]['TOTAL'][0] += 1
+            opponentsMatrix[team2][team1][1] += 1
+            opponentsMatrix[team2]['TOTAL'][1] += 1
+        elif (score2 > score1):
+            opponentsMatrix[team2][team1][0] += 1
+            opponentsMatrix[team2]['TOTAL'][0] += 1
+            opponentsMatrix[team1][team2][1] += 1
+            opponentsMatrix[team1]['TOTAL'][1] += 1
+        else:
+            opponentsMatrix[team1][team2][2] += 1
+            opponentsMatrix[team1]['TOTAL'][2] += 1
+            opponentsMatrix[team2][team1][2] += 1
+            opponentsMatrix[team2]['TOTAL'][2] += 1
+    # Iterate through each team; conduct pairwise on that team
+    for team, opponents in opponentsMatrix.items():
+        # First, set that team's WLT
+        totalWLT = opponentsMatrix[team]['TOTAL']
+        allTeams.loc[team, 'WLT'] = f"{totalWLT[0]}-{totalWLT[1]}-{totalWLT[2]}"
+        if team not in eligibleTeams:
+            continue
+        for opponent in eligibleTeams:
+            if opponent == team:
+                continue
+            # Criteria 1: Head to Head
+            wlt = opponents[opponent]
+            if wlt[0] > wlt[1]:
+                allTeams.loc[team, 'Pairwise'] += 1
+                continue
+            elif wlt[0] < wlt[1]:
+                continue
+            # Criteria 2: Common Opponents
+            teamWinPct = 0
+            oppoWinPct = 0
+            for common in eligibleTeams:
+                teamWLT = opponentsMatrix[team][common]
+                oppoWLT = opponentsMatrix[opponent][common]
+                if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
+                    continue
+                teamGs = teamWLT[0] + teamWLT[1] + teamWLT[2]
+                teamWinPct = teamWinPct + (teamWLT[0] + 0.5 * teamWLT[2]) / teamGs
+                oppoGs = oppoWLT[0] + oppoWLT[1] + oppoWLT[2]
+                oppoWinPct = oppoWinPct + (oppoWLT[0] + 0.5 * oppoWLT[2]) / oppoGs
+            if teamWinPct > oppoWinPct:
+                allTeams.loc[team, 'Pairwise'] += 1
+                continue
+            elif teamWinPct < oppoWinPct:
+                continue
+            # Criteria 3: ELO
+            if teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']:
+                allTeams.loc[team, 'Pairwise'] += 1
+    # Output complete teams.Pairwise column
+    return allTeams
+
 def autocor(game):
     if game.win1 == 1:
         autocor = 2.2/(((game.elo1+game.home_coef)-game.elo2)*.001+2.2)
@@ -144,7 +218,6 @@ def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
     if sort:
         df = df.sort_values(by=rating, ascending=False).copy()
-    df['Rank'] = range(1, len(df) + 1)
     return df
 
 def format_results(df):
