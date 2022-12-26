@@ -14,7 +14,7 @@ nav * {
   font-size: 22px;
 }
 nav li a.current {
-  background-color: #3b73b3 /* rgb(0 123 255) */;
+  background-color: #3b73b3;
   border-radius: 10%;
   color: white !important;
 }
@@ -77,7 +77,7 @@ nav li a.current:hover {
 
 /* Red line to separate rankings-eligible teams from the others */
 .eligibility-separator {
-  border-bottom: 2pt solid lightcoral !important;
+  border-bottom: 3pt solid lightcoral !important;
   background-color:
 }
 
@@ -177,4 +177,24 @@ a {
 }
 #res-col-11 {
   width: 15%;
+}
+
+footer {
+  color: rgb(0, 0, 0, 1);
+  padding: 20px;
+}
+
+.red-border {
+  border: 3pt solid lightcoral;
+  padding: 20px;
+}
+.green-border {
+  border: 3pt solid #7ADB7A;
+  padding: 20px;
+}
+.blue-border {
+  border: 3pt solid #3b73b3;
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }

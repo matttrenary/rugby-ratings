@@ -24,9 +24,9 @@
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
-  <div class="navbar-brand">
-    <img src="/assets/RugbyHawkRounded.svg" alt="logo">RugbyHawk
-  </div>
+    <a class="navbar-brand" href="/index.html">
+      <img src="/assets/RugbyHawkRounded.svg" alt="logo">RugbyHawk
+    </a>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -38,51 +38,56 @@
             <li class="nav-item">
             		<a class="nav-link" href="/results.html">Results</a>
             </li>
+            <li class="nav-item">
+            		<a class="nav-link" href="/about.html">About</a>
+            </li>
         </ul>
     </div>
 </nav>
 
 <div class='container'>
-    <h2>Read this first</h2>
+  <header id="header">
+      <div class="container text-center">
+          <h1 class="pt-5 pb-1 font-weight-bold">
+              RugbyHawk: A Bird's-Eye View of College Rugby
+          </h1>
+      </div>
+  </header>
+
+  <div class="red-border">
+    <h2>Rankings Disclaimer</h2>
     <ul>
-        <li><b>Regional bias:</b> This site's results date back to August 2021 and include two seasons of 15s games for teams in the Midwest/East, and 1.5 seasons of 7s games for teams in the West/South. More games mean more wins by
-            the top teams mean higher ratings for those teams. Expect the top West/South 15s teams and the top Midwest/East 7s teams to rise during spring 2023 play. This seasonal bias should be negligible after another season.
+        <li><b>Men’s Division 1:</b> This website is focused on Division 1 men’s collegiate rugby. Games by Division 1
+           teams against lower-division opponents are included.
+           Non-first side games and shortened games are not included.
         </li>
-        <li><b>Men's D1:</b> This site is focused on Division 1 Men's Collegiate Rugby. Games by Division 1 teams against opponents in other divisions are included.
-            Non first side games and shortened games are not included.
+        <li><b>Small Samples:</b> Like any ranking algorithm, the more games played, and the greater variety of
+          opponents, the more accurate the algorithm will be. 15s rugby tends to have a low number of games, often against
+          a small pool of opponents (each team’s conference). The rankings for teams who play in conferences with very
+          few out-of-conference games should be used with less confidence than those for teams with a wider variety of
+          opponents.
+        </li>
+        <li><b>Regional Bias:</b> This website’s results date back to August 2021 and include 2 seasons of 15s games for
+           teams in the Midwest/East, and 1.5 seasons of 7s games for teams in the West/South. More games mean more wins
+            by the top teams mean higher ratings for those teams. Expect the top West/South 15s teams and the top
+            Midwest/East 7s teams to rise during Spring 2023 play. This seasonal bias should be negligible after
+            another season.
         </li>
     </ul>
-
-    <h2>Rating overview</h2>
-    <p>
-    This site uses an <a href='https://en.wikipedia.org/wiki/Elo_rating_system' target='_blank'>Elo rating system</a>. Elo was started for chess and has been
-    adopted for a variety of sports, including rugby.
-    <a href='https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/' target='_blank'>
-    This research project</a> and <a href='https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/' target='_blank'>538's NFL Prediction detail</a> explain this site's Elo implementation. Additionally, code for this site is <a href='https://github.com/matttrenary/rugby-ratings' target='_blank'>
-    available on GitHub</a>.
-    </p>
-    <p>
-    The primary features of an Elo system are:
+  </div>
+  <div class="blue-border">
+    <h2><a href="/rankings.html">View Our Rankings</a></h2>
     <ul>
-        <li>Teams gain rating points by winning, and lose rating points by losing</li>
-        <li>The gained and lost rating points are equal; it's an exchange of points</li>
-        <li>Teams gain more when beating higher rated teams, and gain fewer when beating lower rated teams. Vice versa with losing.</li>
-        <li>Margin of victory impacts the points gained or lost, but the impact tapers off as the margin increases.</li>
-        <li>Home victories earn fewer rating points than away victories. Vice versa with losing.</li>
+      <li>The <a href="/about.html#elo-explained">Elo ratings</a> use game scores to determine each team’s true skill level.</li>
+      <li>The <a href="/about.html#pairwise-explained">Pairwise Rankings</a> use the Elo as well as head to head results to output the rankings.</li>
+      <li>These rankings are based purely on an objective algorithm.</li>
+      <li>All teams that have played a Division 1 game since 2021 are included in the rankings.</li>
     </ul>
-    All teams start at 1500
-    </p>
-
-    <h2>Cautions in use</h2>
-    <p>
-    Like any rating system, the more games played, and the greater variety of opponents, the more accurate the system will be. 15s rugby tends to have a relatively
-    low number of games, often against a small pool of opponents (the team's conference). The ratings for teams who play in a conference with very few
-    out-of-conference games should be used with less confidence than teams with a wider variety of opponents.
-    </p>
-
-    <h2>Missing games and scores</h2>
-    <p>Let's just say college rugby teams aren't great at publishing scores. Scores and games are definitely missing here, and if you have info to add or correct, please use the form below.</p>
-
+  </div>
+  <div class="green-border">
+    <h2>Help Us Find Scores</h2>
+    <p>College rugby teams aren't great at publishing scores, and we are definitely missing some.
+    If you have information to add or correct, please use the form below. Thank you!</p>
     <script type="text/javascript">var submitted=false;</script>
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thankyou.html';}"></iframe>
     <form action="https://docs.google.com/forms/d/e/1FAIpQLScoV3mKp2o0fA3sPjCw4pquEeX_bVpjphrX4G3LKusC4tdbnQ/formResponse" method="post" target="hidden_iframe" onsubmit="submitted=true;">
@@ -90,21 +95,11 @@
           <br>
           <input type="text" size="35" placeholder="Email*" name="entry.246779433" required />
           <br>
-          <textarea rows="5" cols="37" placeholder="Game, score, or suggestion*" name="entry.962901770" required></textarea>
+          <textarea rows="5" cols="37" placeholder="Game, Score, or Suggestion*" name="entry.962901770" required></textarea>
           <br>
           <button type="submit">Submit</button>
-    </form> <br>
-
-    <h2>Expected updates</h2>
-    <ul>
-        <li>The creation of a <a href='https://www.uscho.com/faq/pairwise-rankings-explanation/' target='_blank'>pairwise ranking as in college hockey</a>. This emphasizes head-to-head victories to help determine which teams are "most deserving" of playoff selection.
-        <li>UX and navigational improvements
-    </ul>
-
-    <h2>Who runs this?</h2>
-    <p>Matt Trenary and George Janke, along with others involved with University of Michigan rugby. This site's code and updates are public to eliminate any fear of favoring Michigan.</p>
-
-    <p>Copyright Matt Trenary and George Janke 2022</p>
+    </form>
+  </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -112,4 +107,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 </body>
+
+<footer>
+  <p>© 2022 Matt Trenary and George Janke</p>
+</footer>
 </html>
