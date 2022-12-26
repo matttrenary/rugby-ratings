@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+import time
 import csv
 import pandas as pd
 import jinja2
@@ -41,7 +42,12 @@ def generate_page(content, template_file, **kwargs):
     template = template_env.get_template(template_file)
 
     now = datetime.now()
-    now = now.strftime("%H:%M %h %-d, %Y")
+    if (time.localtime().tm_isdst == 0):
+        # Append non-daylight savings timezone to timestamp
+        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
+    else:
+        # Append aylight savings timezone to timestamp
+        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
 
     return(template.render(data=content, timestamp=now, **kwargs))
 

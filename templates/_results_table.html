@@ -2,21 +2,34 @@
     <div class="container py-4">
         <div class="table-responsive">
             <table class="table table-hover">
+                <colgroup>
+                  <col span="1" id="res-col-1">
+                  <col span="1" id="res-col-2">
+                  <col span="1" id="res-col-3">
+                  <col span="1" id="res-col-4">
+                  <col span="1" id="res-col-5">
+                  <col span="1" id="res-col-6">
+                  <col span="1" id="res-col-7">
+                  <col span="1" id="res-col-8">
+                  <col span="1" id="res-col-9">
+                  <col span="1" id="res-col-10">
+                  <col span="1" id="res-col-11">
+                </colgroup>
                 <thead class="table-dark">
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col" style="text-align: right">ELO</th>
-                    <th scope="col" style="text-align: right">Adjustment</th>
-                    <th scope="col" style="text-align: right">Home</th>
-                    <th scope="col" style="text-align: right">&nbsp;</th>
-                    <th scope="col" style="text-align: center">&nbsp;</th>
-                    <th scope="col" style="text-align: left">&nbsp;</th>
-                    <th scope="col" style="text-align: left">Away</th>
-                    <th scope="col" style="text-align: left">Adjustment</th>
-                    <th scope="col" style="text-align: left">ELO</th>
-                    <th scope="col">Neutral</th>
+                  <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col" style="text-align: right">Elo</th>
+                      <th scope="col" style="text-align: right">Change</th>
+                      <th scope="col" style="text-align: right">Home</th>
+                      <th scope="col" style="text-align: right">&nbsp;</th>
+                      <th scope="col" style="text-align: center">&nbsp;</th>
+                      <th scope="col" style="text-align: left">&nbsp;</th>
+                      <th scope="col" style="text-align: left">Away</th>
+                      <th scope="col" style="text-align: left">Change</th>
+                      <th scope="col" style="text-align: left">Elo</th>
+                      <th scope="col" style="text-align: right">Neutral</th>
 
-                </tr>
+                  </tr>
                 </thead>
                 <tbody>
                 {% for row in data %}
@@ -43,7 +56,7 @@
                       <td style="text-align: left" class="r-adj">{{ row["adjust2"] }}</td>
                     {% endif %}
                     <td style="text-align: left">{{ row["elo2"] }}</td>
-                    <td>{{ row["Neutral"] }}</td>
+                    <td style="text-align: right">{{ row["Neutral"] }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

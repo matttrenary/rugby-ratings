@@ -25,7 +25,7 @@ nav li a.current:hover {
   font-size: 22px;
   padding-top: 6px;
   padding-bottom: 2px;
-  color: #3b73b3 !important;
+  color: black !important;
   font-weight: bold;
 }
 .navbar-brand img {
@@ -57,16 +57,16 @@ nav li a.current:hover {
 
 /* Color the ratings adjustments in the results table */
 .neg-adj.l-adj {
-  background: linear-gradient(to left, lightcoral 50%, transparent 0%);
+  background: linear-gradient(to left, lightcoral 75%, transparent 0%);
 }
 .neg-adj.r-adj {
-  background: linear-gradient(to right, lightcoral 50%, transparent 0%);
+  background: linear-gradient(to right, lightcoral 75%, transparent 0%);
 }
 .pos-adj.l-adj {
-  background: linear-gradient(to left, palegreen 50%, transparent 0%);
+  background: linear-gradient(to left, #7ADB7A 75%, transparent 0%);
 }
 .pos-adj.r-adj {
-  background: linear-gradient(to right, palegreen 50%, transparent 0%);
+  background: linear-gradient(to right, #7ADB7A 75%, transparent 0%);
 }
 
 /* Format Last Updated text */
@@ -127,4 +127,54 @@ nav li a.current:hover {
 /* Make all links steel blue in order to match theme */
 a {
   color: #3b73b3;
+}
+
+/* Fix column widths for tables */
+#rank-col-1 {
+  width: 10%;
+}
+#rank-col-2 {
+  width: 40%;
+}
+#rank-col-3 {
+  width: 20%;
+}
+#rank-col-4 {
+  width: 15%;
+}
+#rank-col-5 {
+  width: 15%;
+}
+#res-col-1 {
+  width: 15%;
+}
+#res-col-2 {
+  width: 5%;
+}
+#res-col-3 {
+  width: 7%;
+}
+#res-col-4 {
+  width: 18%;
+}
+#res-col-5 {
+  width: 4%;
+}
+#res-col-6 {
+  width: 2%;
+}
+#res-col-7 {
+  width: 4%;
+}
+#res-col-8 {
+  width: 18%;
+}
+#res-col-9 {
+  width: 7%;
+}
+#res-col-10 {
+  width: 5%;
+}
+#res-col-11 {
+  width: 15%;
 }
