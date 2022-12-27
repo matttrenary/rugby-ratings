@@ -54,10 +54,17 @@ def load_results(code):
 
     teams['Pairwise'] = 0
     teams['WLT'] = "0-0-0"
-    teams = calculate_pairwise(teams[teams['Eligible']], teams, df)
+    # Pass this value into calculate_pairwise to limit rankings to this school year
+    # df.loc[df['Date'] > '2022-07-01']
+    teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, df)
 
     teams = format_ratings(teams, 'Elo')
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
+
+    # Catch Pairwise tiebreakers
+    teams = pairwise_tiebreakers(teams, opponentsMatrix)
+    teams = teams.sort_values(by=['Pairwise', 'Eligible', 'TiebreakPairwise', 'Elo'], ascending=False).copy()
+
     teams['Rank'] = range(1, len(teams) + 1)
     df = format_results(df)
 
@@ -96,7 +103,6 @@ def qualify_teams(teams, df):
                 newEligible.append(key)
                 possible2.pop(key)
         possible = possible2
-    print("Eligible Teams: ", len(eligible))
     # Add eligibility to teams dataframe
     teams['Eligible'] = False
     for team in eligible:
@@ -177,7 +183,7 @@ def calculate_pairwise(teams, allTeams, df):
             # Criteria 2: Common Opponents
             teamWinPct = 0
             oppoWinPct = 0
-            for common in eligibleTeams:
+            for common in completeTeams:
                 teamWLT = opponentsMatrix[team][common]
                 oppoWLT = opponentsMatrix[opponent][common]
                 if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
@@ -195,7 +201,61 @@ def calculate_pairwise(teams, allTeams, df):
             if teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']:
                 allTeams.loc[team, 'Pairwise'] += 1
     # Output complete teams.Pairwise column
-    return allTeams
+    return allTeams, opponentsMatrix
+
+def pairwise_tiebreakers(teams, opponentsMatrix):
+    completeTeams = list(teams.index.values)
+    teams['TiebreakPairwise'] = 0
+    i = 0
+    currPWR = teams['Pairwise'][i]
+    while currPWR != 0:
+        j = i
+        teamsTied = [completeTeams[i]]
+        while teams['Pairwise'][j + 1] == currPWR:
+            j += 1
+            teamsTied.append(completeTeams[j])
+        numTied = j - i + 1
+        if (numTied < 2):
+            i = j + 1
+            currPWR = teams['Pairwise'][i]
+            continue
+        # Run new pairwise on tied teams
+        for team in teamsTied:
+            for opponent in teamsTied:
+                if opponent == team:
+                    continue
+                # Criteria 1: Head to Head
+                wlt = opponentsMatrix[team][opponent]
+                if wlt[0] > wlt[1]:
+                    teams.loc[team, 'TiebreakPairwise'] += 1
+                    continue
+                elif wlt[0] < wlt[1]:
+                    continue
+                # Criteria 2: Common Opponents
+                teamWinPct = 0
+                oppoWinPct = 0
+                for common in completeTeams:
+                    teamWLT = opponentsMatrix[team][common]
+                    oppoWLT = opponentsMatrix[opponent][common]
+                    if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
+                        continue
+                    teamGs = teamWLT[0] + teamWLT[1] + teamWLT[2]
+                    teamWinPct = teamWinPct + (teamWLT[0] + 0.5 * teamWLT[2]) / teamGs
+                    oppoGs = oppoWLT[0] + oppoWLT[1] + oppoWLT[2]
+                    oppoWinPct = oppoWinPct + (oppoWLT[0] + 0.5 * oppoWLT[2]) / oppoGs
+                if teamWinPct > oppoWinPct:
+                    teams.loc[team, 'TiebreakPairwise'] += 1
+                    continue
+                elif teamWinPct < oppoWinPct:
+                    continue
+                # Criteria 3: ELO
+                if teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']:
+                    teams.loc[team, 'TiebreakPairwise'] += 1
+        # Reset variables in order to continue iterating
+        i = j + 1
+        currPWR = teams['Pairwise'][i]
+    return teams
+
 
 def autocor(game):
     if game.win1 == 1:
