@@ -7,6 +7,7 @@ Created on Thu Nov 17 14:24:45 2022
 import argparse
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 def parse_arguments():
     """Parse arguments when executed from CLI"""
@@ -54,9 +55,20 @@ def load_results(code):
 
     teams['Pairwise'] = 0
     teams['WLT'] = "0-0-0"
-    # Pass this value into calculate_pairwise to limit rankings to this school year
-    # df.loc[df['Date'] > '2022-07-01']
-    teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, df)
+    # Modify df to limit rankings to this school year
+    now = datetime.now()
+    today = now.strftime("%m-%d")
+    if today < '07-01':
+        lastYear = int(now.strftime("%Y")) - 1
+        lastCutoff = str(lastYear) + "-07-01"
+        nextCutoff = now.strftime("%Y-07-01")
+    else:
+        lastCutoff = now.strftime("%Y-07-01")
+        nextYear = int(now.strftime("%Y")) + 1
+        nextCutoff = str(nextYear) + "-07-01"
+
+    teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams,
+        df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff)])
 
     teams = format_ratings(teams, 'Elo')
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
