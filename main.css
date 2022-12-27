@@ -184,15 +184,16 @@ footer {
   padding: 20px;
 }
 
+/* Borders used on the home page */
 .red-border {
   border: 3pt solid lightcoral;
   padding: 20px;
 }
-.green-border {
+.blue-border {
   border: 3pt solid #3b73b3 /* #7ADB7A */;
   padding: 20px;
 }
-.blue-border {
+.black-border {
   border: 3pt solid black /* #3b73b3 */;
   padding: 20px;
   margin-top: 20px;
@@ -204,6 +205,7 @@ footer {
   padding-right: 40px;
 }
 
+/* Make forms look pretty */
 form input {
   padding: 10px;
   margin: 5px;
@@ -211,7 +213,6 @@ form input {
   border-radius:10px;
   width: 25%;
 }
-
 form textarea {
   padding: 10px;
   margin: 5px;
@@ -219,11 +220,37 @@ form textarea {
   border-radius:10px;
   width: 50%;
 }
-
 form button {
   padding: 10px;
   margin-left: 5px;
   border: 2px solid black;
   background-color: rgb(0, 0, 0, 0.25);
   border-radius:10px;
+}
+
+/* Make everything prettier on mobile devices */
+@media
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+  /* .current highlighting on navbar looks weird on mobile */
+  nav li a.current {
+    background-color: transparent;
+    border-radius: 0%;
+    color: black !important;
+  }
+  nav li a.current:hover {
+    color: black !important;
+  }
+  nav li a:hover {
+    color: black !important;
+  }
+
+  /* Form needs to be full width on mobile */
+  form input {
+    width: 100%;
+  }
+  form textarea {
+    width: 100%;
+  }
 }
