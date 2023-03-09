@@ -44,10 +44,10 @@ def generate_page(content, template_file, **kwargs):
     now = datetime.now()
     if (time.localtime().tm_isdst == 0):
         # Append non-daylight savings timezone to timestamp
-        now = now.strftime("%#I:%M %p on %h %#d, %Y ") + time.tzname[0]
+        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
     else:
         # Append daylight savings timezone to timestamp
-        now = now.strftime("%#I:%M %p on %h %#d, %Y ") + time.tzname[time.daylight]
+        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
