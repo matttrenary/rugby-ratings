@@ -99,6 +99,9 @@ def qualify_teams(teams, df):
     newEligible = []
     newEligible.append(max(possible, key=possible.get))
     possible.pop(newEligible[0])
+    # Start with the top two teams in terms of games played
+    newEligible.append(max(possible, key=possible.get))
+    possible.pop(newEligible[1])
     while (len(newEligible) > 0):
         eligible = eligible + newEligible
         newEligible = []
