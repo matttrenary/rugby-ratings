@@ -19,8 +19,16 @@
                   </tr>
                 </thead>
                 <tbody>
+                {% set eligibleTeamArea = 'True' %}
                 {% for row in data %}
-                  {% if row["Pairwise"] == '0' and row["Eligible"] == 'True' %}
+                  {% if eligibleTeamArea == 'True' and row["Eligible"] == 'False' %}
+                    {% set eligibleTeamArea = 'False' %}
+                    <tr>
+                      <td class="eligibility-separator" style="text-align: center" colspan="5">
+                        Teams below this line need more games to be eligible for PWR points. <a
+                          href="/about.html#eligibility-explained">Read more here.</a>
+                      </td>
+                    </tr>
                     <tr>
                       <td>{{ row["Rank"] }}</td>
                       <td><a href='/teams/{{ row["TeamLink"] }}.html'
@@ -28,12 +36,6 @@
                       <td style="text-align: center">{{ row["WLT"] }}</td>
                       <td style="text-align: center">{{ row["Elo"] }}</td>
                       <td style="text-align: center">{{ row["Pairwise"] }}</td>
-                    </tr>
-                    <tr>
-                      <td class="eligibility-separator" style="text-align: center" colspan="5">
-                        Teams below this line need more games to be eligible for PWR points. <a
-                          href="/about.html#eligibility-explained">Read more here.</a>
-                      </td>
                     </tr>
                   {% else %}
                     <tr>
