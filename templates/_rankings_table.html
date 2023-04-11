@@ -19,10 +19,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                {% set eligibleTeamArea = 'True' %}
+                {% set eligibleTeamArea = [] %}
                 {% for row in data %}
-                  {% if eligibleTeamArea == 'True' and row["Eligible"] == 'False' %}
-                    {% set eligibleTeamArea = 'False' %}
+                  {% if (not eligibleTeamArea) and row["Eligible"] == 'False' %}
+                    {% if eligibleTeamArea.append('Nope') %}
+                    {% endif %}
                     <tr>
                       <td class="eligibility-separator" style="text-align: center" colspan="5">
                         Teams below this line need more games to be eligible for PWR points. <a
