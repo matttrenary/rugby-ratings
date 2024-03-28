@@ -32,7 +32,10 @@ def parse_arguments():
 
 def load_results(code):
     fname = code + '.csv'
-    df = pd.read_csv(fname, parse_dates=['Date'])
+    df = pd.read_csv(fname)
+    df['Date'] = df['Date'].replace(r'^([1-9]/)', r'0\1', regex=True)
+    df['Date'] = df['Date'].replace(r'/([1-9]/)', r'/0\1', regex=True)
+    df['Date'] = pd.to_datetime(df['Date'], format="%m/%d/%y")
 
     # Only games with scores for both teams
     df = df[~(df.Score1.isnull()) & ~(df.Score2.isnull())].copy()
@@ -40,7 +43,7 @@ def load_results(code):
     ### Prepare teams ELO list
     teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
     teams = teams.drop_duplicates()
-    teams['Elo'] = 1500
+    teams['Elo'] = 1500.00
     teams['TeamLink'] = team_link(teams.Team)
     teams = teams.set_index('Team')
 
@@ -222,17 +225,17 @@ def pairwise_tiebreakers(teams, opponentsMatrix):
     completeTeams = list(teams.index.values)
     teams['TiebreakPairwise'] = 0
     i = 0
-    currPWR = teams['Pairwise'][i]
+    currPWR = teams['Pairwise'].iloc[i]
     while currPWR != 0:
         j = i
         teamsTied = [completeTeams[i]]
-        while teams['Pairwise'][j + 1] == currPWR:
+        while teams['Pairwise'].iloc[j + 1] == currPWR:
             j += 1
             teamsTied.append(completeTeams[j])
         numTied = j - i + 1
         if (numTied < 2):
             i = j + 1
-            currPWR = teams['Pairwise'][i]
+            currPWR = teams['Pairwise'].iloc[i]
             continue
         # Run new pairwise on tied teams
         for team in teamsTied:
@@ -268,7 +271,7 @@ def pairwise_tiebreakers(teams, opponentsMatrix):
                     teams.loc[team, 'TiebreakPairwise'] += 1
         # Reset variables in order to continue iterating
         i = j + 1
-        currPWR = teams['Pairwise'][i]
+        currPWR = teams['Pairwise'].iloc[i]
     return teams
 
 
