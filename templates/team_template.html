@@ -24,9 +24,10 @@
 {% block content_title%}
 <header id="header">
     <div class="container text-center">
-        <h1 class="pt-5 pb-1 font-weight-bold">
-            {{ content_title }}
+        <h1 class="pt-0 pb-0">
+		   <strong>{{ content_title }}</strong>
         </h1>
+	   <p class="pt-5 pb-1" style="font-size:20px">{{ content_subtitle }}</p>
     </div>
 </header>
 {% endblock %}

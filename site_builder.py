@@ -78,7 +78,13 @@ def generate_teams():
                                   id='results7s')
 
         content = body15s + body7s
-        content = generate_page(content, 'team_template.html', content_title=row.Team)
+        if (pd.isna(row.Gov)):
+            subtitle = "Lower-Division Program"
+        else:
+            subtitle = row.Gov + " " + row.Div + " - " + row.Conf
+        content = generate_page(content, 'team_template.html',
+                                content_title=row.Team,
+                                content_subtitle=subtitle)
 
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)

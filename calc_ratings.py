@@ -40,9 +40,11 @@ def load_results(code):
     # Only games with scores for both teams
     df = df[~(df.Score1.isnull()) & ~(df.Score2.isnull())].copy()
 
+    # Load in Teams.csv (for division info)
+    fname = "Teams.csv"
+    teams = pd.read_csv(fname, names=('Team', 'Conf', 'Div', 'Gov'))
+
     ### Prepare teams ELO list
-    teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
-    teams = teams.drop_duplicates()
     teams['Elo'] = 1500.00
     teams['TeamLink'] = team_link(teams.Team)
     teams = teams.set_index('Team')

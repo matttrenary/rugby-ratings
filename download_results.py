@@ -9,7 +9,7 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-workbook_name = "College Rugby Results"
+workbook_name = "RugbyHawk Testing"
 
 def parse_arguments():
     """Parse arguments when executed from CLI"""
@@ -57,6 +57,9 @@ def main(args):
         download_results('15s')
     if code == '7s' or code == 'both':
         download_results('7s')
+    if code in ('15s', '7s', 'both'):
+        download_results('Teams')
+        download_results('Divisions')
     pass
 
 if __name__ == "__main__":
