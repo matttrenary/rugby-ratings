@@ -59,6 +59,21 @@ def generate_teams():
     df7s = pd.read_csv('Results7s.csv', header = 0).fillna('')
     df15s = pd.read_csv('Results15s.csv', header = 0).fillna('')
 
+    # Determine current season (for referencing conf/div/gov table)
+    now = datetime.now()
+    today = now.strftime("%m-%d")
+    if today < '07-01':
+        laterYear = int(now.strftime("%Y"))
+        earlyYear = laterYear - 1
+    else:
+        earlyYear = int(now.strftime("%Y"))
+        laterYear = earlyYear + 1
+    seasonString = str(earlyYear) + "-" + str(laterYear)
+        
+    fname = "Org.csv"
+    org = pd.read_csv(fname, names=('Season', 'Team', 'Conf', 'Div', 'Gov'))
+    org = org.loc[org['Season'] == seasonString]
+
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
         games15s['adjust1'] = games15s['adjust1'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
@@ -78,10 +93,15 @@ def generate_teams():
                                   id='results7s')
 
         content = body15s + body7s
-        if (pd.isna(row.Gov)):
+
+        # Determine team's current conf/div/gov
+        teamOrg = org.loc[org['Team'] == row.Team]
+
+        if (teamOrg.empty):
             subtitle = "Lower-Division Program"
         else:
-            subtitle = row.Gov + " " + row.Div + " - " + row.Conf
+            teamOrg = teamOrg.iloc[0]
+            subtitle = teamOrg.Gov + " " + teamOrg.Div + " - " + teamOrg.Conf
         content = generate_page(content, 'team_template.html',
                                 content_title=row.Team,
                                 content_subtitle=subtitle)

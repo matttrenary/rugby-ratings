@@ -9,6 +9,7 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+# TODO: Change this to "College Rugby Results"
 workbook_name = "RugbyHawk Testing"
 
 def parse_arguments():
@@ -59,7 +60,7 @@ def main(args):
         download_results('7s')
     if code in ('15s', '7s', 'both'):
         download_results('Teams')
-        download_results('Divisions')
+        download_results('Org')
     pass
 
 if __name__ == "__main__":

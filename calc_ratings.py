@@ -43,6 +43,7 @@ def load_results(code):
     # Load in Teams.csv (for division info)
     fname = "Teams.csv"
     teams = pd.read_csv(fname, names=('Team', 'Conf', 'Div', 'Gov'))
+    teams.drop(columns=['Conf', 'Div', 'Gov'], inplace=True)
 
     ### Prepare teams ELO list
     teams['Elo'] = 1500.00
