@@ -111,50 +111,105 @@ def generate_teams():
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
 
-    # Create broader conf/div pages
+    # Create broader conf/gov/div pages
     confs = teams['Conf'].dropna().unique()
     confLinks = teams['ConfLink'].dropna().unique()
-    divs = teams['GovDiv'].dropna().unique()
-    divLinks = teams['GovDivLink'].dropna().unique()
+    govDivs = teams['GovDiv'].dropna().unique()
+    govDivLinks = teams['GovDivLink'].dropna().unique()
+    govs = teams['Gov'].dropna().unique()
+    divs = teams['Div'].dropna().unique()
     team15s = pd.merge(team15s, org, how='left', on='Team')
     team7s = pd.merge(team7s, org, how='left', on='Team')
 
+    disc = 'This is our best understanding of conference membership. <a \
+            href="/confs/index.html">Read more here.</a>'
     for i, conf in enumerate(confs):
         members15s = team15s[team15s.Conf == conf].copy()
         body15s = generate_from_df(members15s,
                                    "_rankings_table.html",
                                    title=f'{conf} 15s Rankings',
                                    id='rankings15s',
-                                   active='show active') 
+                                   active='show active',
+                                   disclaimer=disc) 
         members7s = team7s[team7s.Conf == conf].copy()
         body7s = generate_from_df(members7s,
                                   "_rankings_table.html",
                                   title=f'{conf} 7s Rankings',
-                                  id='rankings7s')
+                                  id='rankings7s',
+                                  disclaimer=disc)
         content = body15s + body7s
 
         content = generate_page(content, 'rankings_template.html',
                                 content_title=conf)
         page_name = 'confs/' + confLinks[i] + '.html'
         save_page(page_name, content)
-    for i, div in enumerate(divs):
-        members15s = team15s[team15s.GovDiv == div].copy()
+    disc = 'This is our best understanding of each team\'s membership. <a \
+            href="/divs/index.html">Read more here.</a>'
+    for i, govDiv in enumerate(govDivs):
+        members15s = team15s[team15s.GovDiv == govDiv].copy()
+        body15s = generate_from_df(members15s,
+                                   "_rankings_table.html",
+                                   title=f'{govDiv} 15s Rankings',
+                                   id='rankings15s',
+                                   active='show active',
+                                   disclaimer=disc) 
+        members7s = team7s[team7s.GovDiv == govDiv].copy()
+        body7s = generate_from_df(members7s,
+                                  "_rankings_table.html",
+                                  title=f'{govDiv} 7s Rankings',
+                                  id='rankings7s',
+                                  disclaimer=disc)
+        content = body15s + body7s
+        subGov = govDiv.split(" ")[0]
+        subDiv = govDiv.split(" ")[1]
+        subText = "<a href=/divs/" + subGov.lower() + ".html>" + \
+                  subGov + " governance</a> - <a href=/divs/" + \
+                  subDiv.lower() + ".html>" + subDiv + " subdivision</a>"
+
+        content = generate_page(content, 'division_template.html',
+                                content_title=govDiv,
+                                content_subtitle=subText)
+        page_name = 'divs/' + govDivLinks[i] + '.html'
+        save_page(page_name, content)
+    for gov in govs:
+        members15s = team15s[team15s.Gov == gov].copy()
+        body15s = generate_from_df(members15s,
+                                   "_rankings_table.html",
+                                   title=f'{gov} 15s Rankings',
+                                   id='rankings15s',
+                                   active='show active',
+                                   disclaimer=disc) 
+        members7s = team7s[team7s.Gov == gov].copy()
+        body7s = generate_from_df(members7s,
+                                  "_rankings_table.html",
+                                  title=f'{gov} 7s Rankings',
+                                  id='rankings7s',
+                                  disclaimer=disc)
+        content = body15s + body7s
+        content = generate_page(content, 'rankings_template.html',
+                                content_title=gov)
+        page_name = 'divs/' + gov.lower() + '.html'
+        save_page(page_name, content)
+    for div in divs:
+        members15s = team15s[team15s.Div == div].copy()
         body15s = generate_from_df(members15s,
                                    "_rankings_table.html",
                                    title=f'{div} 15s Rankings',
                                    id='rankings15s',
-                                   active='show active') 
-        members7s = team7s[team7s.GovDiv == div].copy()
+                                   active='show active',
+                                   disclaimer=disc) 
+        members7s = team7s[team7s.Div == div].copy()
         body7s = generate_from_df(members7s,
                                   "_rankings_table.html",
                                   title=f'{div} 7s Rankings',
-                                  id='rankings7s')
+                                  id='rankings7s',
+                                  disclaimer=disc)
         content = body15s + body7s
-
         content = generate_page(content, 'rankings_template.html',
                                 content_title=div)
-        page_name = 'divs/' + divLinks[i] + '.html'
+        page_name = 'divs/' + div.lower() + '.html'
         save_page(page_name, content)
+
 
 def save_page(page_name, content):
     with open(page_name, "w+") as f:
@@ -174,11 +229,14 @@ def main(args):
     print(f"### Building pages: {args.code} ###")
 
     code = args.code
+    disc = 'Teams aren\'t displayed if they don\'t have any Division 1 games in our system. <a \
+            href="/about.html#eligibility-explained">Read more here.</a>'
     if code == '15s' or code == 'both':
         body_rankings15s = generate_from_csv('Ratings15s.csv',
                                             '_rankings_table.html',
                                             id='rankings15s',
-                                            active='show active')
+                                            active='show active',
+                                            disclaimer=disc)
 
         body_results15s = generate_from_csv('Results15s.csv',
                                             '_results_table.html',
@@ -188,7 +246,8 @@ def main(args):
     if code == '7s' or code == 'both':
         body_rankings7s = generate_from_csv('Ratings7s.csv',
                                            '_rankings_table.html',
-                                           id='rankings7s')
+                                           id='rankings7s',
+                                           disclaimer=disc)
 
         body_results7s = generate_from_csv('Results7s.csv',
                                            '_results_table.html',
