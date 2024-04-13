@@ -72,7 +72,11 @@ def generate_teams():
         
     fname = "Org.csv"
     org = pd.read_csv(fname, names=('Season', 'Team', 'Conf', 'Div', 'Gov'))
+    org['GovDiv'] = org['Gov'] + " " + org['Div']
     org = org.loc[org['Season'] == seasonString]
+    teams = pd.merge(teams, org, how='left', on='Team')
+    teams['ConfLink'] = team_link(teams['Conf'])
+    teams['GovDivLink'] = team_link(teams['GovDiv'])
 
     for index, row in teams.iterrows():
         games15s = df15s[(df15s.Team1==row.Team) | (df15s.Team2==row.Team)].copy()
@@ -95,13 +99,11 @@ def generate_teams():
         content = body15s + body7s
 
         # Determine team's current conf/div/gov
-        teamOrg = org.loc[org['Team'] == row.Team]
-
-        if (teamOrg.empty):
+        if (pd.isna(row.Gov)):
             subtitle = "Lower-Division Program"
         else:
-            teamOrg = teamOrg.iloc[0]
-            subtitle = teamOrg.Gov + " " + teamOrg.Div + " - " + teamOrg.Conf
+            subtitle = "<a href=/divs/" + row.GovDivLink + ".html>" + row.GovDiv + "</a>" + " - " + \
+                       "<a href=/confs/" + row.ConfLink + ".html>" + row.Conf + "</a>"
         content = generate_page(content, 'team_template.html',
                                 content_title=row.Team,
                                 content_subtitle=subtitle)
@@ -109,9 +111,64 @@ def generate_teams():
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
 
+    # Create broader conf/div pages
+    confs = teams['Conf'].dropna().unique()
+    confLinks = teams['ConfLink'].dropna().unique()
+    divs = teams['GovDiv'].dropna().unique()
+    divLinks = teams['GovDivLink'].dropna().unique()
+    team15s = pd.merge(team15s, org, how='left', on='Team')
+    team7s = pd.merge(team7s, org, how='left', on='Team')
+
+    for i, conf in enumerate(confs):
+        members15s = team15s[team15s.Conf == conf].copy()
+        body15s = generate_from_df(members15s,
+                                   "_rankings_table.html",
+                                   title=f'{conf} 15s Rankings',
+                                   id='rankings15s',
+                                   active='show active') 
+        members7s = team7s[team7s.Conf == conf].copy()
+        body7s = generate_from_df(members7s,
+                                  "_rankings_table.html",
+                                  title=f'{conf} 7s Rankings',
+                                  id='rankings7s')
+        content = body15s + body7s
+
+        content = generate_page(content, 'rankings_template.html',
+                                content_title=conf)
+        page_name = 'confs/' + confLinks[i] + '.html'
+        save_page(page_name, content)
+    for i, div in enumerate(divs):
+        members15s = team15s[team15s.GovDiv == div].copy()
+        body15s = generate_from_df(members15s,
+                                   "_rankings_table.html",
+                                   title=f'{div} 15s Rankings',
+                                   id='rankings15s',
+                                   active='show active') 
+        members7s = team7s[team7s.GovDiv == div].copy()
+        body7s = generate_from_df(members7s,
+                                  "_rankings_table.html",
+                                  title=f'{div} 7s Rankings',
+                                  id='rankings7s')
+        content = body15s + body7s
+
+        content = generate_page(content, 'rankings_template.html',
+                                content_title=div)
+        page_name = 'divs/' + divLinks[i] + '.html'
+        save_page(page_name, content)
+
 def save_page(page_name, content):
     with open(page_name, "w+") as f:
         f.write(content)
+
+def team_link(series):
+    series = series.str.lower()
+    series = series.str.replace(' ','', regex=False)
+    series = series.str.replace("'",'', regex=False)
+    series = series.str.replace('.','', regex=False)
+    series = series.str.replace('&','', regex=False)
+    series = series.str.replace('(','', regex=False)
+    series = series.str.replace(')','', regex=False)
+    return series
 
 def main(args):
     print(f"### Building pages: {args.code} ###")
