@@ -46,19 +46,17 @@
 </nav>
 
 <div class='container'>
-    <div>
-      <h2>Contributors</h2>
-      <p>This website is run by Matt Trenary and George Janke, along with others involved with University of Michigan
-        Rugby. The site's code and and its update history are public in order to eliminate any fear of favoring Michigan.
-        <a href="https://github.com/matttrenary/rugby-ratings">Find our GitHub here.</a></p>
-      <p>RugbyHawk’s Elo rating system is based on <a href="https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/">a master’s research project by Northwestern University’s Marcus
-        Thuillier</a> as well as <a href="https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/">FiveThirtyEight’s National Football League Elo implementation</a>.</p>
-      <p>While RugbyHawk’s Pairwise Ranking system is tailored to college rugby,
-        it is inspired by <a href="https://www.uscho.com/faq/pairwise-rankings-explanation/">USCHO’s version for college hockey.</a></p>
-        <br>
-    </div>
-    <div id="elo-explained">
-      <h2>Elo Rating System</h2>
+<div>
+  <h2>How Does This Work?</h2>
+    <ul>
+      <li>RugbyHawk rankings are based purely on objective algorithms, and all teams that have played a Division 1 game since 2021 are included in the rankings.</li>
+      <li>The <a href="/about.html#elo-explained">Elo ratings</a> use game scores to determine each team’s true skill level. 1500 is considered average.</li>
+      <li>The <a href="/about.html#pairwise-explained">Pairwise Rankings</a> use the Elo as well as head-to-head results to output current rankings.</li>
+    </ul>
+</div>
+	
+<div id="elo-explained">
+  <h2>Elo Rating System</h2>
       <p>The <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating system</a> was created for chess and has been adopted for a variety of sports, including rugby.
         <a href="https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/">This site</a> and <a href="https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/">this site</a> help explain our implementation for Elo, and <a href="https://github.com/matttrenary/rugby-ratings">our code is on GitHub.</a></p>
       The primary features of an Elo system are:
@@ -71,9 +69,11 @@
         <li>Home victories earn fewer rating points than away victories (vice versa for losing).</li>
       </ul>
       <p>All teams start at 1500, which is considered the average rating.</p>
-      <br>
-    </div>
-    <div id="pairwise-explained">
+      <p>Our Elo rating system is based on <a href="https://sites.northwestern.edu/msia/2019/01/25/introducing-a-new-rating-system-for-world-rugby-union-based-on-the-elo-rating-system-the-elor-elo-rugby/">a master’s research project by Northwestern University’s Marcus
+        Thuillier</a> as well as <a href="https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/">FiveThirtyEight’s National Football League Elo implementation</a>.</p>
+</div>
+	
+<div id="pairwise-explained">
     <h2>Pairwise Ranking System (PWR)</h2>
       <p>RugbyHawk’s Pairwise Rankings emphasize head-to-head victories in order to determine which teams are “most
         deserving” of playoff selection. In the Pairwise, every team is compared against every other team, and the
@@ -87,9 +87,19 @@
       </ol>
       <p>The criteria are evaluated in order, and when either team wins a criterion, they are considered to have won the
       full comparison.</p>
-      <br>
-    </div>
-    <div id="eligibility-explained">
+      <p>Our Pairwise Ranking system is tailored to college rugby,
+        and inspired by <a href="https://www.uscho.com/faq/pairwise-rankings-explanation/">USCHO’s version for college hockey.</a></p>
+</div>
+
+<div>
+    <h2>What Games are Included?</h2>
+	  <p>We currently provide rankings only for Division 1 men’s college rugby. Games are only included
+          if they are full length and between two schools' first sides. Games
+          played by Division 1 teams against lower-division opponents are still included.
+	  </p>
+</div>
+	
+<div id="eligibility-explained">
     <h2>Eligible Teams</h2>
       It’s only possible to give teams an accurate rating/ranking if there’s enough data of their games.
       More specifically, teams need:
@@ -106,36 +116,24 @@
         <a href="/index.html#scores-help">reporting them here.</a></p>
       <p>If your team doesn’t appear on this website at all, it’s because our records say they haven’t played any
         Division 1 games since Fall 2021.</p>
-        <br>
-      </div>
-      <div>
-    <h2>Rankings Disclaimer</h2>
-    <ul>
-        <li><b>Men’s Division 1:</b> This website focuses on Division 1 men’s college rugby. Games are only included
-          if they are full length and between two schools' first sides. Games
-          played by Division 1 teams against lower-division opponents are still included.
-        </li>
-        <li><b>Small Samples:</b> The more games played, and the greater variety of opponents, the more accurate the
+      <p>
+	The more games played, and the greater variety of opponents, the more accurate the
           algorithm will be. 15s rugby tends to have a low number of games, often against a small pool of opponents
           (each team’s conference). The rankings for teams who play in conferences with very few nonconference games
-          should be used with less confidence than those for teams with a wider variety of opponents.
-        </li>
-    </ul>
-  </div>
-  <br>
-  <div>
-    <h2>Expected Updates</h2>
-      <ul>
-        <li><b>Optimization for Mobile:</b> Our results tables require horizontal scrolling on mobile. We need to make
-          your viewing experience better on mobile devices.</li>
-        <li><b>Algorithm Explanation:</b> While RugbyHawk’s Elo algorithm is already public on GitHub, we should
-           provide the formula on this page in order to make it easier to understand. For now, fill out any questions
-          you have about either the Elo or the Pairwise in the form below, and we'd love to explain.</li>
-      </ul>
-	 <br>
-
+          should be used with less confidence than those for teams with a wider variety of opponents.      
+      </p>
+</div>
+	
+<div>
+  <h2>Who are We?</h2>
+      <p>RugbyHawk is run by Matt Trenary and George Janke, and also features contributions from others involved with University of Michigan
+        Rugby. The site's code and and its update history are public in order to eliminate any fear of favoring Michigan.
+        <a href="https://github.com/matttrenary/rugby-ratings">Find our GitHub here.</a>
+      </p>
+</div>
+	
+  <div> 
     <p>Have feedback? Please fill out this form to let us know.</p>
-
     <script type="text/javascript">var submitted=false;</script>
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thankyou.html';}"></iframe>
     <form action="https://docs.google.com/forms/d/e/1FAIpQLScoV3mKp2o0fA3sPjCw4pquEeX_bVpjphrX4G3LKusC4tdbnQ/formResponse" method="post" target="hidden_iframe" onsubmit="submitted=true;">
