@@ -314,7 +314,13 @@ def format_results(df):
 
     # Make it so that recent results show up before earlier ones
     df = df.sort_values(by=['Date','Seq'], ascending=[False,False])
-    df.Date = df.Date.dt.strftime('%b %-d, %Y')
+    # If-Then statement handles OS-level differences in C's strftime() func
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        df.Date = df.Date.dt.strftime('%b %e, %Y')
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        df.Date = df.Date.dt.strftime('%b %-d, %Y')
 
     return df
 
