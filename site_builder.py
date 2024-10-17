@@ -1,4 +1,5 @@
 import argparse
+import sys
 from datetime import datetime
 import time
 import csv
@@ -42,12 +43,23 @@ def generate_page(content, template_file, **kwargs):
     template = template_env.get_template(template_file)
 
     now = datetime.now()
-    if (time.localtime().tm_isdst == 0):
-        # Append non-daylight savings timezone to timestamp
-        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
+    # If-Then statement handles OS-level differences in C's strftime() func
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        if (time.localtime().tm_isdst == 0):
+            # Append non-daylight savings timezone to timestamp
+            now = now.strftime("%r:%M %p on %h %e, %Y ") + time.tzname[0]
+        else:
+            # Append daylight savings timezone to timestamp
+            now = now.strftime("%r:%M %p on %h %e, %Y ") + time.tzname[time.daylight]
     else:
-        # Append daylight savings timezone to timestamp
-        now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        if (time.localtime().tm_isdst == 0):
+            # Append non-daylight savings timezone to timestamp
+            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
+        else:
+            # Append daylight savings timezone to timestamp
+            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
