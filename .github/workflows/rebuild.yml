@@ -1,4 +1,4 @@
-name: run main2 test
+name: run site rebuild
 on:
   schedule: # Times are in UTC
   - cron: '0 1,2,4 * * *' # Every night at 9pm and 11pm
@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 'site rebuild'
+      - name: run rebuild.py
         env:
           GSPREAD_CREDENTIALS: ${{ secrets.GSPREAD_CREDENTIALS }}
         run: |
