@@ -65,6 +65,9 @@ def load_results(df):
     df = df[~(df.Score1.isnull()) & ~(df.Score2.isnull())].copy()
     df = df[(df.Score1!='') & (df.Score2!='')].copy()
 
+    # Ensure scores are ints for accurate comparison
+    df = df.astype({'Score1': 'int', 'Score2': 'int'})
+
     ### Prepare teams ELO list
     teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
     teams = teams.drop_duplicates()
