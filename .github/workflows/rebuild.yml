@@ -1,6 +1,7 @@
 name: run site rebuild
 on:
   schedule: # Times are in UTC
+    - cron: '10 12 * * *' # Temp run to fix scores
     - cron: '0 2,4 * * *' # Every night at 9pm and 11pm
     - cron: '0 2,19,20,21,22,23 * * 6' # 9pm on Friday + Afternoon hourly on Saturday starting at 2pm
     - cron: '0 0,1,2,3,15,17,19,21,23 * * 0' # Continuation of hourly Saturday until 10pm + Sunday every 2 hours starting at 10am
