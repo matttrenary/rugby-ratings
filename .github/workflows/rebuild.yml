@@ -1,5 +1,6 @@
 name: run site rebuild
 on:
+  workflow_dispatch: # To allow manual run
   schedule: # Times are in UTC
     - cron: '0,30 11,13 * * *' # Temp run to fix scores
     - cron: '10,30 12 * * *' # Temp run to fix scores
