@@ -262,3 +262,8 @@ only screen and (max-width: 760px),
     width: 25%;
   }
 }
+
+/* Frontpage results tighter table */
+#recent-results-container .table td, .table th {
+  padding: .1rem;
+}
