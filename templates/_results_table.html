@@ -1,4 +1,5 @@
 <div class='tab-pane fade {{ active }}' id='{{ id }}' role='tabpanel' aria-labelledby='{{ id }}-tab'>
+    {% if data %}
     <div class="container py-4">
         <div class="table-responsive">
             <table class="table table-hover">
@@ -69,4 +70,7 @@
             </table>
         </div>
     </div>
+    {% else %}
+    No games to display!
+    {% endif %}
 </div>
