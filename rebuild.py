@@ -11,10 +11,11 @@ import gspread
 import pandas as pd
 import numpy as np
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import jinja2
 from dateutil.tz import tzlocal
 import pytz
+import local_utils
 
 workbook_name = "College Rugby Results"
 
@@ -60,13 +61,14 @@ def load_results(df):
     df['Date'] = df['Date'].replace(r'^([1-9]/)', r'0\1', regex=True)
     df['Date'] = df['Date'].replace(r'/([1-9]/)', r'/0\1', regex=True)
     df['Date'] = pd.to_datetime(df['Date'], format="%m/%d/%y")
+    
+    # Only games with two teams
+    df = df[~(df.Team1.isnull()) & ~(df.Team2.isnull())].copy()
+    df = df[(df.Team1!='') & (df.Team2!='')].copy()
 
-    # Only games with scores for both teams
-    df = df[~(df.Score1.isnull()) & ~(df.Score2.isnull())].copy()
-    df = df[(df.Score1!='') & (df.Score2!='')].copy()
-
-    # Ensure scores are ints for accurate comparison
-    df = df.astype({'Score1': 'int', 'Score2': 'int'})
+    # Ensure scores are ints
+    df.Score1 = df.Score1.replace('', np.nan).astype('Int64')
+    df.Score2 = df.Score2.replace('', np.nan).astype('Int64')
 
     ### Prepare teams ELO list
     teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
@@ -81,8 +83,14 @@ def load_results(df):
 
     for index, row in df.iterrows():
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
-        calculate_elo(game, teams)
-        update_results(df, index, game)
+        
+        set_elo(game, teams)
+
+        if not pd.isna(game.margin):
+            calculate_elo(game, teams)
+            update_results(df, index, game)
+        else:
+            update_results_nan(df, index, game)
 
     teams['Pairwise'] = 0
     teams['WLT'] = "0-0-0"
@@ -98,8 +106,8 @@ def load_results(df):
         nextYear = int(now.strftime("%Y")) + 1
         nextCutoff = str(nextYear) + "-07-01"
 
-    teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams,
-        df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff)])
+    pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) & (df.Score1>=0) & (df.Score2>=0)]
+    teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
     teams = format_ratings(teams, 'Elo')
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
@@ -155,6 +163,10 @@ def qualify_teams(teams, df):
         teams.loc[team, 'Eligible'] = True
     return teams
 
+def set_elo(game, teams):
+    game.elo1 = teams.loc[game.team1, 'Elo']
+    game.elo2 = teams.loc[game.team2, 'Elo']
+
 def calculate_elo(game, teams):
     # Elo coefficients
     k = 40
@@ -162,9 +174,6 @@ def calculate_elo(game, teams):
     margin_coef = np.log(game.margin + x)
     if game.neutral != 'Yes':
         game.home_coef = 75
-
-    game.elo1 = teams.loc[game.team1, 'Elo']
-    game.elo2 = teams.loc[game.team2, 'Elo']
 
     # Auto correlation coefficient
     game.autocor = autocor(game)
@@ -320,6 +329,14 @@ def update_results(df, index, game):
     df.loc[index, 'adjust1'] = game.adjust1
     df.loc[index, 'adjust2'] = game.adjust2
 
+def update_results_nan(df, index, game):
+    df.loc[index, 'elo1'] = game.elo1
+    df.loc[index, 'elo2'] = game.elo2
+    df.loc[index, 'rn1'] = np.nan
+    df.loc[index, 'rn2'] = np.nan
+    df.loc[index, 'adjust1'] = np.nan
+    df.loc[index, 'adjust2'] = np.nan
+
 def format_ratings(df, rating='Elo', sort=True):
     df[rating] = df[rating].round(0).astype(int)
     if sort:
@@ -327,16 +344,36 @@ def format_ratings(df, rating='Elo', sort=True):
     return df
 
 def format_results(df):
-    df.Score1 = df.Score1.astype(int)
-    df.Score2 = df.Score2.astype(int)
-    df = format_ratings(df, 'elo1', False)
-    df = format_ratings(df, 'elo2', False)
-    df = format_ratings(df, 'rn1', False)
-    df = format_ratings(df, 'rn2', False)
-    df = format_ratings(df, 'adjust1', False)
-    df = format_ratings(df, 'adjust2', False)
-    df['adjust1'] = df['adjust1'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
-    df['adjust2'] = df['adjust2'].apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+    # Don't like this long-term
+    for index, row in df.iterrows():
+        try:
+            df.loc[index, 'Score1'] = int(row.Score1)
+            df.loc[index, 'Score2'] = int(row.Score2)
+        except:
+            None
+
+        try:
+            df.loc[index, 'elo1'] = int(round(row.elo1))
+            df.loc[index, 'elo2'] = int(round(row.elo2))
+        except:
+            None
+        
+        try:
+            df.loc[index, 'rn1'] = int(round(row.rn1))
+            df.loc[index, 'rn2'] = int(round(row.rn2))
+            df.loc[index, 'adjust1'] = int(round(row.adjust1))
+            df.loc[index, 'adjust2'] = int(round(row.adjust2))
+            df.loc[index, 'adjust1'] = row.adjust1.apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+            df.loc[index, 'adjust2'] = row.adjust2.apply(lambda x: str(x) if int(x)<1 else '+' + str(x))
+        except:
+            None
+
+    format_ratings(df, 'elo1', False)
+    format_ratings(df, 'elo2', False)
+
+    df.adjust1 = df.adjust1.fillna('')
+    df.adjust2 = df.adjust2.fillna('')
+    
     df['Team1Link'] = team_link(df.Team1)
     df['Team2Link'] = team_link(df.Team2)
 
@@ -400,6 +437,21 @@ def generate_teams(team15s, team7s, results15s, results7s):
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
 
+def rebuild_front(df):
+    # Generate table
+    body = generate_from_df(df,
+                            '_results_table.html',
+                            id='recent_results',
+                            active='show active')
+
+    # Replace html on front page
+    with open('index.html', 'r+') as front_page:
+        new_html = local_utils.replace_element(front_page.read(),
+                                               'div',
+                                               'recent_results',
+                                               body)
+        save_page('index.html', new_html)
+
 def save_page(page_name, content):
     with open(page_name, "w+") as f:
         f.write(content)
@@ -407,9 +459,9 @@ def save_page(page_name, content):
 class Game:
     def __init__(self, team1, score1, team2, score2, neutral, additional):
         self.team1 = team1
-        self.score1 = int(score1)
+        self.score1 = score1
         self.team2 = team2
-        self.score2 = int(score2)
+        self.score2 = score2
         self.neutral = neutral
         self.additional = additional
         self.home_coef = 0
@@ -417,18 +469,28 @@ class Game:
         self.calc_winloss()
 
     def calc_margin(self):
-        self.margin = abs(self.score1 - self.score2)
+        try:
+            self.score1 >= 0
+            self.score2 >= 0
+        except:
+            self.margin = np.nan
+        else:
+            self.margin = abs(self.score1 - self.score2)
 
     def calc_winloss(self):
-        if self.score1 > self.score2:
-            self.win1 = 1
-            self.win2 = 0
-        elif self.score1 < self.score2:
-            self.win1 = 0
-            self.win2 = 1
-        else:
-            self.win1 = .5
-            self.win2 = .5
+        try:
+            if self.score1 > self.score2:
+                self.win1 = 1
+                self.win2 = 0
+            elif self.score1 < self.score2:
+                self.win1 = 0
+                self.win2 = 1
+            else:
+                self.win1 = .5
+                self.win2 = .5
+        except:
+            self.win1 = np.nan
+            self.win2 = np.nan
 
 def main(args):
     print(f"### Calculating results: {args.code} ###")
@@ -476,6 +538,11 @@ def main(args):
     save_page('rankings.html', content_rankings)
 
     generate_teams(rankings15s, rankings7s, results15s, results7s)
+
+    # Update frontpage with recent results
+    results_all = pd.concat([results15s,results7s])
+    game_subset = local_utils.load_range(results_all, 2, 2)
+    rebuild_front(game_subset)
 
 if __name__ == "__main__":
     arguments = parse_arguments()
