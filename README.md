@@ -1,10 +1,8 @@
 # rugby-ratings
-Calculate and publish team rugby ratings based on game results
+Calculates and publishes team rugby ratings based on game results
 
-# Steps for success
-1. Run download_results.py
-2. Run calc_ratings.py
-3. Run site_builder.py
-4. Get generated files to this repository
-
-All take a code argument with options: 7s, 15s, both. Default is both.
+# Process
+- rebuild.py is scheduled via GitHub Actions
+- It pulls scores from a Google Spreadsheet, calculates the ratings and rankings, and then produces html pages via Jinja
+- The built-in GitHub Pages Action then processes the html and markdown to complete the site refresh
+- Certain pages (about, thankyou, etc.) are not part of the rebuild and are updated manually as needed
