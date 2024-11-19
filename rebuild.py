@@ -4,7 +4,6 @@ Created on Thu Nov 17 14:24:45 2022
 
 @author: trenary
 """
-import argparse
 import os
 import ast
 import gspread
@@ -18,27 +17,6 @@ import pytz
 import local_utils
 
 workbook_name = "College Rugby Results"
-
-def parse_arguments():
-    """Parse arguments when executed from CLI"""
-    parser = argparse.ArgumentParser(
-        prog="calc-elo",
-        description="CLI tool to calculate Elo ratings from game results",
-    )
-    parser.add_argument(
-        "--code",
-        choices=["15s", "7s", "both"],
-        default="both",
-        help="15s or 7s results",
-    )
-    parser.add_argument(
-        "--refresh",
-        choices=["all", "new"],
-        default="new",
-        help="all past games or only those without ratings",
-    )
-    args = parser.parse_args()
-    return args
 
 def download_results(code):
     """Download results using the Google Sheets API"""
@@ -846,51 +824,52 @@ class Game:
             self.win1 = np.nan
             self.win2 = np.nan
 
-def main(args):
-    print(f"### Calculating results: {args.code} ###")
+def main():
+    # 15s
+    games15s = download_results('15s')
+    rankings15s, results15s = load_results(games15s)
+    rankings15s = rankings15s.reset_index().copy()
 
-    code = args.code
-    if code == '15s' or code == 'both':
-        games15s = download_results('15s')
-        rankings15s, results15s = load_results(games15s)
-        rankings15s = rankings15s.reset_index().copy()
+    body_rankings15s = generate_from_df(rankings15s,
+                                        '_rankings_table.html',
+                                        id='rankings15s',
+                                        active='show active')
 
-        body_rankings15s = generate_from_df(rankings15s,
-                                            '_rankings_table.html',
-                                            id='rankings15s',
-                                            active='show active')
+    body_results15s = generate_from_df(results15s,
+                                        '_results_table.html',
+                                        id='results15s',
+                                        active='show active')
 
-        body_results15s = generate_from_df(results15s,
-                                            '_results_table.html',
-                                            id='results15s',
-                                            active='show active')
-    if code == '7s' or code == 'both':
-        games7s = download_results('7s')
-        rankings7s, results7s = load_results(games7s)
-        rankings7s = rankings7s.reset_index().copy()
+    # 7s
+    games7s = download_results('7s')
+    rankings7s, results7s = load_results(games7s)
+    rankings7s = rankings7s.reset_index().copy()
 
-        body_rankings7s = generate_from_df(rankings7s,
-                                            '_rankings_table.html',
-                                            id='rankings7s',
-                                            active='show active')
+    body_rankings7s = generate_from_df(rankings7s,
+                                        '_rankings_table.html',
+                                        id='rankings7s',
+                                        active='show active')
 
-        body_results7s = generate_from_df(results7s,
-                                            '_results_table.html',
-                                            id='results7s',
-                                            active='show active')
+    body_results7s = generate_from_df(results7s,
+                                        '_results_table.html',
+                                        id='results7s',
+                                        active='show active')
 
+    # Combined results
     body_results = body_results15s + body_results7s
     content_results = generate_page(body_results,
                                     'results_template.html',
                                     content_title='Division 1 College Rugby Results')
     save_page('results.html', content_results)
 
+    # Rankings
     body_rankings = body_rankings15s + body_rankings7s
     content_rankings = generate_page(body_rankings,
                                     'rankings_template.html',
                                     content_title='Division 1 College Rugby Rankings')
     save_page('rankings.html', content_rankings)
 
+    # Team pages
     generate_teams(rankings15s, rankings7s, results15s, results7s)
 
     # Update frontpage with recent results
@@ -899,5 +878,4 @@ def main(args):
     rebuild_front(game_subset)
 
 if __name__ == "__main__":
-    arguments = parse_arguments()
-    main(arguments)
+    main()
