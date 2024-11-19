@@ -847,13 +847,11 @@ def main():
 
     body_rankings7s = generate_from_df(rankings7s,
                                         '_rankings_table.html',
-                                        id='rankings7s',
-                                        active='show active')
+                                        id='rankings7s')
 
     body_results7s = generate_from_df(results7s,
                                         '_results_table.html',
-                                        id='results7s',
-                                        active='show active')
+                                        id='results7s')
 
     # Combined results
     body_results = body_results15s + body_results7s
