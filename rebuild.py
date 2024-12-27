@@ -6,6 +6,7 @@ Created on Thu Nov 17 14:24:45 2022
 """
 import os
 import ast
+import sys
 import gspread
 import pandas as pd
 import numpy as np
@@ -711,7 +712,12 @@ def format_results(df):
 
     # Make it so that recent results show up before earlier ones
     df = df.sort_values(by=['Date','Seq'], ascending=[False,False])
-    df.Date = df.Date.dt.strftime('%b %-d, %Y')
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        df.Date = df.Date.dt.strftime('%b %e, %Y')
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        df.Date = df.Date.dt.strftime('%b %-d, %Y')
 
     return df
 
@@ -740,8 +746,18 @@ def generate_page(content, template_file, **kwargs):
     template = template_env.get_template(template_file)
 
     now = datetime.now()
-    now = now.astimezone(pytz.timezone('US/Eastern'))
-    now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+    if sys.platform.startswith('win'):
+            # Code for Windows OS goes here
+            now = now.astimezone(pytz.timezone('US/Eastern'))
+            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+        else:
+            # Code for MacOS (Darwin), as well as other other systems, goes here
+            if (time.localtime().tm_isdst == 0):
+                # Append non-daylight savings timezone to timestamp
+                now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
+            else:
+                # Append daylight savings timezone to timestamp
+                now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
