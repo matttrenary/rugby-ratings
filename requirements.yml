@@ -1,5 +1,6 @@
 name: rugbyhawk
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - python
