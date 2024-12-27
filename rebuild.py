@@ -747,17 +747,17 @@ def generate_page(content, template_file, **kwargs):
 
     now = datetime.now()
     if sys.platform.startswith('win'):
-            # Code for Windows OS goes here
-            now = now.astimezone(pytz.timezone('US/Eastern'))
-            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+        # Code for Windows OS goes here
+        now = now.astimezone(pytz.timezone('US/Eastern'))
+        now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        if (time.localtime().tm_isdst == 0):
+            # Append non-daylight savings timezone to timestamp
+            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
         else:
-            # Code for MacOS (Darwin), as well as other other systems, goes here
-            if (time.localtime().tm_isdst == 0):
-                # Append non-daylight savings timezone to timestamp
-                now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
-            else:
-                # Append daylight savings timezone to timestamp
-                now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
+            # Append daylight savings timezone to timestamp
+            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
