@@ -1,4 +1,6 @@
+# Google Credentials (for addition to environ variable)
 GDriveCredential.json
+# Staging Spreadsheets with results
 Results7s.csv
 Results15s.csv
 Ratings7s.csv
@@ -7,6 +9,10 @@ Ratings15s.csv
 15s.csv
 Org.csv
 Teams.csv
+# Python Venv
 /venv
-support
+# Random support files
+support/
+# Random other stuff
 .DS_Store
+__pycache__/
