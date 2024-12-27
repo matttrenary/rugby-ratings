@@ -1,8 +1,23 @@
 # rugby-ratings
 Calculates and publishes team rugby ratings based on game results
 
-# Process
+#### Process
 - rebuild.py is scheduled via GitHub Actions
 - It pulls scores from a Google Spreadsheet, calculates the ratings and rankings, and then produces html pages via Jinja
 - The built-in GitHub Pages Action then processes the html and markdown to complete the site refresh
 - Certain pages (about, thankyou, etc.) are not part of the rebuild and are updated manually as needed
+
+#### Local Development
+Follow the below steps to get up and running locally:
+1. Add text within .gitignore'd GDriveCredential.json to GSPREAD_CREDENTIALS environment variable
+2. Create a new conda (conda env create -f requirements.yml) or pip venv (python -m venv venv; pip install -r requirements.txt) environment
+3. Activate the conda (conda activate rugbyhawk) or pip venv (source venv/bin/activate) environment
+4. Run rebuild.py (python rebuild.py) to apply the changes you made to the code
+5. Host rugbyhawk locally (python -m http.server) to see how the changes you made look
+6. Push the changes back to GitHub!
+
+#### Contributors
+- Matt Trenary
+- George Janke
+- Raymond Li
+- Luke Zana
