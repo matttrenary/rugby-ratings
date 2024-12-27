@@ -1,0 +1,10 @@
+name: rugbyhawk
+channels:
+  - defaults
+dependencies:
+  - python
+  - bs4
+  - gspread
+  - jinja2
+  - numpy
+  - pandas
