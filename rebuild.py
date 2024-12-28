@@ -456,19 +456,27 @@ def generate_teams(team15s, team7s, results15s, results7s):
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
 
-def rebuild_front(df):
+def rebuild_front(df_15s, df_7s):
     # Generate table
-    body = generate_from_df(df,
+    body_15s = generate_from_df(df_15s,
                             '_results_table.html',
-                            id='recent_results',
+                            id='recent_results_15s',
+                            active='show active')
+    body_7s = generate_from_df(df_7s,
+                            '_results_table.html',
+                            id='recent_results_7s',
                             active='show active')
 
     # Replace html on front page
     with open('index.html', 'r+') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
                                                'div',
-                                               'recent_results',
-                                               body)
+                                               'recent_results_15s',
+                                               body_15s)
+        new_html = local_utils.replace_element(new_html,
+                                               'div',
+                                               'recent_results_7s',
+                                               body_7s)
         save_page('index.html', new_html)
 
 def save_page(page_name, content):
@@ -559,9 +567,9 @@ def main():
     generate_teams(rankings15s, rankings7s, results15s, results7s)
 
     # Update frontpage with recent results
-    results_all = pd.concat([results15s,results7s])
-    game_subset = local_utils.load_range(results_all, 2, 2)
-    rebuild_front(game_subset)
+    game_subset_15s = local_utils.load_range(results15s, 2, 2)
+    game_subset_7s = local_utils.load_range(results7s, 2, 2)
+    rebuild_front(game_subset_15s, game_subset_7s)
 
 if __name__ == "__main__":
     main()
