@@ -337,6 +337,10 @@ def update_results_nan(df, index, game):
     df.loc[index, 'adjust2'] = np.nan
 
 def format_results(df):
+    # Prep for turning adjust1/2 floats to strs
+    df['adjust1'] = df['adjust1'].astype(str)
+    df['adjust2'] = df['adjust2'].astype(str)
+
     # Don't like this long-term
     for index, row in df.iterrows():
         try:
@@ -358,15 +362,15 @@ def format_results(df):
             None
 
         try:
-            if round(row.adjust1) < 1:
-                df.loc[index, 'adjust1'] = str(int(round(row.adjust1)))
+            if round(float(row.adjust1)) < 1:
+                df.loc[index, 'adjust1'] = str(int(round(float(row.adjust1))))
             else:
-                df.loc[index, 'adjust1'] = '+' + str(int(round(row.adjust1)))
+                df.loc[index, 'adjust1'] = '+' + str(int(round(float(row.adjust1))))
             
-            if round(row.adjust2) < 1:
-                df.loc[index, 'adjust2'] = str(int(round(row.adjust2)))
+            if round(float(row.adjust2)) < 1:
+                df.loc[index, 'adjust2'] = str(int(round(float(row.adjust2))))
             else:
-                df.loc[index, 'adjust2'] = '+' + str(int(round(row.adjust2)))
+                df.loc[index, 'adjust2'] = '+' + str(int(round(float(row.adjust2))))
         except:
             None
 
