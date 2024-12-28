@@ -109,12 +109,11 @@ def load_results(df):
     pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) & (df.Score1>=0) & (df.Score2>=0)]
     teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
-    teams = format_ratings(teams, 'Elo')
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
-
     # Catch Pairwise tiebreakers
     teams = pairwise_tiebreakers(teams, opponentsMatrix)
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'TiebreakPairwise', 'Elo'], ascending=False).copy()
+    teams['Elo'] = teams['Elo'].round(0).astype(int)
 
     teams['Rank'] = range(1, len(teams) + 1)
     df = format_results(df)
@@ -337,12 +336,6 @@ def update_results_nan(df, index, game):
     df.loc[index, 'adjust1'] = np.nan
     df.loc[index, 'adjust2'] = np.nan
 
-def format_ratings(df, rating='Elo', sort=True):
-    df[rating] = df[rating].round(0).astype(int)
-    if sort:
-        df = df.sort_values(by=rating, ascending=False).copy()
-    return df
-
 def format_results(df):
     # Don't like this long-term
     for index, row in df.iterrows():
@@ -377,8 +370,8 @@ def format_results(df):
         except:
             None
 
-    format_ratings(df, 'elo1', False)
-    format_ratings(df, 'elo2', False)
+    df['elo1'] = df['elo1'].round(0).astype(int)
+    df['elo2'] = df['elo2'].round(0).astype(int)
 
     df.adjust1 = df.adjust1.fillna('')
     df.adjust2 = df.adjust2.fillna('')
