@@ -10,7 +10,7 @@ _calculate and publish rugby team ratings based on game results_
 ## Local Development
 Follow the below steps to get up and running locally:
 1. Add text within .gitignore'd GDriveCredential.json to `GSPREAD_CREDENTIALS` environment variable
-2. Create a new conda (`conda env create -f requirements.yml`) or pip venv (`python -m venv venv; pip install -r requirements.txt`) environment
+2. Create a new conda (`conda env create -f requirements.yml`) or pip venv (`python -m venv venv ; pip install -r requirements.txt`) environment
 3. Activate the conda (`conda activate rugbyhawk`) or pip venv (`source venv/bin/activate`) environment
 4. Run rebuild.py (`python rebuild.py`) to apply the changes you made to the code
 5. Host rugbyhawk locally (`python -m http.server`) to see how the changes you made look
