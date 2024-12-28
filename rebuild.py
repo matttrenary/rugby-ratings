@@ -337,18 +337,14 @@ def update_results_nan(df, index, game):
     df.loc[index, 'adjust2'] = np.nan
 
 def format_results(df):
-    # Prep for turning adjust1/2 floats to strs
-    df['adjust1'] = df['adjust1'].astype(str)
-    df['adjust2'] = df['adjust2'].astype(str)
+    # Prep for turning numeric columns to strs
+    df['adjust1'] = df['adjust1'].astype('string')
+    df['adjust2'] = df['adjust2'].astype('string')
+    df['Score1'] = df['Score1'].astype('string')
+    df['Score2'] = df['Score2'].astype('string')
 
     # Don't like this long-term
     for index, row in df.iterrows():
-        try:
-            df.loc[index, 'Score1'] = int(row.Score1)
-            df.loc[index, 'Score2'] = int(row.Score2)
-        except:
-            None
-
         try:
             df.loc[index, 'elo1'] = int(round(row.elo1))
             df.loc[index, 'elo2'] = int(round(row.elo2))
@@ -379,6 +375,8 @@ def format_results(df):
 
     df.adjust1 = df.adjust1.fillna('')
     df.adjust2 = df.adjust2.fillna('')
+    df.Score1 = df.Score1.fillna('')
+    df.Score2 = df.Score2.fillna('')
     
     df['Team1Link'] = team_link(df.Team1)
     df['Team2Link'] = team_link(df.Team2)
@@ -518,6 +516,7 @@ def main():
     games15s = download_results('15s')
     rankings15s, results15s = load_results(games15s)
     rankings15s = rankings15s.reset_index().copy()
+    results15s
 
     body_rankings15s = generate_from_df(rankings15s,
                                         '_rankings_table.html',
