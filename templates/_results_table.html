@@ -44,11 +44,11 @@
                     {% else %}
                       <td style="text-align: right" class="l-adj">{{ row["adjust1"] }}</td>
                     {% endif %}
-                    <td style="text-align: right"><a href='/teams/{{ row["Team1Link"] }}.html'>{{ row["Team1"] }}</a></td>
+				<td style="text-align: right"><a href='/teams/{{ row["Team1Link"] }}.html{{ linkExt }}'>{{ row["Team1"] }}</a></td>
                     <td style="text-align: right">{{ row["Score1"] }}</td>
                     <td style="text-align: center">-</td>
                     <td style="text-align: left">{{ row["Score2"] }}</td>
-                    <td style="text-align: left"><a href='/teams/{{ row["Team2Link"] }}.html'>{{ row["Team2"] }}</a></td>
+				<td style="text-align: left"><a href='/teams/{{ row["Team2Link"] }}.html{{ linkExt }}'>{{ row["Team2"] }}</a></td>
                     {% if row["adjust2"][0] == "+" %}
                       <td style="text-align: left" class="pos-adj r-adj">{{ row["adjust2"] }}</td>
                     {% elif row["adjust2"][0] == "-" %}

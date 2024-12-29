@@ -402,12 +402,17 @@ def team_link(series):
     series = series.str.replace(')','', regex=False)
     return series
 
-def generate_from_df(df, template_file, **kwargs):
+def generate_from_df(df, template_file, id, **kwargs):
     data = []
     for index, row in df.iterrows():
         data = data + [row.to_dict()]
 
-    return(generate_page(data, template_file, **kwargs))
+    if id[-2:] == '7s':
+        linkExt = '#7s'
+    else:
+        linkExt = ''
+
+    return(generate_page(data, template_file, id=id, linkExt=linkExt, **kwargs))
 
 def generate_page(content, template_file, **kwargs):
     """Generate site in local directory"""
@@ -440,15 +445,15 @@ def generate_teams(team15s, team7s, results15s, results7s):
         games15s = results15s[(results15s.Team1==row.Team) | (results15s.Team2==row.Team)].copy()
         body15s = generate_from_df(games15s,
                                    "_results_table.html",
-                                   title=f'{row.Team} 15s Results',
                                    id='results15s',
+                                   title=f'{row.Team} 15s Results',
                                    active='show active')
 
         games7s = results7s[(results7s.Team1==row.Team) | (results7s.Team2==row.Team)].copy()
         body7s = generate_from_df(games7s,
                                   "_results_table.html",
-                                  title=f'{row.Team} 7s Results',
-                                  id='results7s')
+                                  id='results7s',
+                                  title=f'{row.Team} 7s Results')
 
         content = body15s + body7s
         content = generate_page(content, 'team_template.html', content_title=row.Team)
