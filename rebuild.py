@@ -429,12 +429,7 @@ def generate_page(content, template_file, **kwargs):
         now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
     else:
         # Code for MacOS (Darwin), as well as other other systems, goes here
-        if (time.localtime().tm_isdst == 0):
-            # Append non-daylight savings timezone to timestamp
-            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
-        else:
-            # Append daylight savings timezone to timestamp
-            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+        now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
