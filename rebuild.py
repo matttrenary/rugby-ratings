@@ -422,9 +422,9 @@ def generate_page(content, template_file, **kwargs):
     template = template_env.get_template(template_file)
 
     now = datetime.now()
+    now = now.astimezone(pytz.timezone('US/Eastern'))
     if sys.platform.startswith('win'):
         # Code for Windows OS goes here
-        now = now.astimezone(pytz.timezone('US/Eastern'))
         now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
     else:
         # Code for MacOS (Darwin), as well as other other systems, goes here
