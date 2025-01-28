@@ -96,6 +96,7 @@ def load_results(df):
     teams['WLT'] = "0-0-0"
     # Modify df to limit rankings to this school year
     now = datetime.now()
+    now = now.astimezone(pytz.timezone('US/Eastern'))
     today = now.strftime("%m-%d")
     if today < '07-01':
         lastYear = int(now.strftime("%Y")) - 1
@@ -430,10 +431,10 @@ def generate_page(content, template_file, **kwargs):
         # Code for MacOS (Darwin), as well as other other systems, goes here
         if (time.localtime().tm_isdst == 0):
             # Append non-daylight savings timezone to timestamp
-            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[0]
+            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
         else:
             # Append daylight savings timezone to timestamp
-            now = now.strftime("%-I:%M %p on %h %-d, %Y ") + time.tzname[time.daylight]
+            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
 
     return(template.render(data=content, timestamp=now, **kwargs))
 
