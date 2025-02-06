@@ -31,6 +31,19 @@
 </header>
 {% endblock %}
 
+{% block content %}
+<div class="container text-center mt-4">
+    <h2 class="font-weight-bold">Team Information</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Current Season WLT:</strong> {{ wlt }}</p>
+            <p><strong>Current Elo:</strong> {{ current_elo }}</p>
+            <p><strong>Current Pairwise:</strong> {{ current_pairwise }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 
+
 {% block sub_nav %}
 
 <ul class="nav nav-pills mb-3 nav-fill" id="pills-tab" role="tablist">

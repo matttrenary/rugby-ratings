@@ -791,6 +791,7 @@ def generate_teams(team15s, team7s, results15s, results7s):
         page_name = 'teams/' + row.TeamLink + '.html'
         save_page(page_name, content)
 
+
 def rebuild_front(df):
     # Generate table
     body = generate_from_df(df,
