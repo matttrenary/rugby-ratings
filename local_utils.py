@@ -37,7 +37,7 @@ def load_range(df, days_num_back, days_num_forward):
     # Arrange date objects
     days_ago = datetime.now(pytz.timezone('America/New_York')).date() - timedelta(days=days_num_back)
     days_ahead = datetime.now(pytz.timezone('America/New_York')).date() + timedelta(days=days_num_forward)
-    df['Date'] = pd.to_datetime(df['Date']).dt.date
+    df['Date'] = pd.to_datetime(df['Date'], format='mixed').dt.date
     
     # Filter df to our subset of games
     df = df[(df['Date'] >= days_ago) & (df['Date'] <= days_ahead)].copy()
