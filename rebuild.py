@@ -469,7 +469,7 @@ def rebuild_front(df_15s, df_7s):
                             active='show active')
 
     # Replace html on front page
-    with open('index.html', 'r+') as front_page:
+    with open('results.html', 'r+') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
                                                'div',
                                                'recent_results_15s',
@@ -478,7 +478,7 @@ def rebuild_front(df_15s, df_7s):
                                                'div',
                                                'recent_results_7s',
                                                body_7s)
-        save_page('index.html', new_html)
+        save_page('results.html', new_html)
 
 def save_page(page_name, content):
     with open(page_name, "w+") as f:
@@ -545,7 +545,7 @@ def main():
     content_rankings = generate_page(body_rankings,
                                     'rankings_template.html',
                                     content_title='Division 1 College Rugby Rankings')
-    save_page('rankings.html', content_rankings)
+    save_page('index.html', content_rankings)
 
     # Team pages
     generate_teams(rankings15s, rankings7s, results15s, results7s)
