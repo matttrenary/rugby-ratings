@@ -468,8 +468,18 @@ def rebuild_front(df_15s, df_7s):
                             id='recent_results_7s',
                             active='show active')
 
+    now = datetime.now()
+    now = now.astimezone(pytz.timezone('US/Eastern'))
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+    now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
+
     # Replace html on front page
-    with open('index.html', 'r+') as front_page:
+    with open('results.html', 'r+') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
                                                'div',
                                                'recent_results_15s',
@@ -478,7 +488,11 @@ def rebuild_front(df_15s, df_7s):
                                                'div',
                                                'recent_results_7s',
                                                body_7s)
-        save_page('index.html', new_html)
+        new_html = local_utils.replace_element(new_html,
+                                               'p',
+                                               'results_timestamp',
+                                               now)
+        save_page('results.html', new_html)
 
 def save_page(page_name, content):
     with open(page_name, "w+") as f:
@@ -525,16 +539,10 @@ def main():
     games15s = download_results('15s')
     rankings15s, results15s = load_results(games15s)
     rankings15s = rankings15s.reset_index().copy()
-    results15s
 
     body_rankings15s = generate_from_df(rankings15s,
                                         '_rankings_table.html',
                                         id='rankings15s',
-                                        active='show active')
-
-    body_results15s = generate_from_df(results15s,
-                                        '_results_table.html',
-                                        id='results15s',
                                         active='show active')
 
     # 7s
@@ -546,23 +554,12 @@ def main():
                                         '_rankings_table.html',
                                         id='rankings7s')
 
-    body_results7s = generate_from_df(results7s,
-                                        '_results_table.html',
-                                        id='results7s')
-
-    # Combined results
-    body_results = body_results15s + body_results7s
-    content_results = generate_page(body_results,
-                                    'results_template.html',
-                                    content_title='Division 1 College Rugby Results')
-    save_page('results.html', content_results)
-
     # Rankings
     body_rankings = body_rankings15s + body_rankings7s
     content_rankings = generate_page(body_rankings,
                                     'rankings_template.html',
                                     content_title='Division 1 College Rugby Rankings')
-    save_page('rankings.html', content_rankings)
+    save_page('index.html', content_rankings)
 
     # Team pages
     generate_teams(rankings15s, rankings7s, results15s, results7s)
