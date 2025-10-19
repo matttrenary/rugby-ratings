@@ -468,6 +468,16 @@ def rebuild_front(df_15s, df_7s):
                             id='recent_results_7s',
                             active='show active')
 
+    now = datetime.now()
+    now = now.astimezone(pytz.timezone('US/Eastern'))
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+    now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
+
     # Replace html on front page
     with open('results.html', 'r+') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
@@ -478,6 +488,10 @@ def rebuild_front(df_15s, df_7s):
                                                'div',
                                                'recent_results_7s',
                                                body_7s)
+        new_html = local_utils.replace_element(new_html,
+                                               'p',
+                                               'results_timestamp',
+                                               now)
         save_page('results.html', new_html)
 
 def save_page(page_name, content):
