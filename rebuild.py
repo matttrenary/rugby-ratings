@@ -525,17 +525,11 @@ def main():
     games15s = download_results('15s')
     rankings15s, results15s = load_results(games15s)
     rankings15s = rankings15s.reset_index().copy()
-    # DEL results15s
 
     body_rankings15s = generate_from_df(rankings15s,
                                         '_rankings_table.html',
                                         id='rankings15s',
                                         active='show active')
-
-    # DEL body_results15s = generate_from_df(results15s,
-                                        # DEL '_results_table.html',
-                                        # DEL id='results15s',
-                                        # DEL active='show active')
 
     # 7s
     games7s = download_results('7s')
@@ -545,17 +539,6 @@ def main():
     body_rankings7s = generate_from_df(rankings7s,
                                         '_rankings_table.html',
                                         id='rankings7s')
-
-    # DEL body_results7s = generate_from_df(results7s,
-                                        # DEL '_results_table.html',
-                                        # DEL id='results7s')
-
-    # Combined results
-    # DEL body_results = body_results15s + body_results7s
-    # DEL content_results = generate_page(body_results,
-                                    # DEL 'results_template.html',
-                                    # DEL content_title='Division 1 College Rugby Results')
-    # DEL save_page('results.html', content_results)
 
     # Rankings
     body_rankings = body_rankings15s + body_rankings7s
