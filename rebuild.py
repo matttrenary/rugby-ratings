@@ -94,8 +94,8 @@ def load_results(df):
     last_week_calculated = False
     for index, row in df.iterrows():
         # Once at lastWk, grab the week-old rankings
-        if row.Date > lastWk and not last_week_calculated:
-            week_old_teams, _ = rank_teams(teams, df, today)
+        if row.Date > last_week and not last_week_calculated:
+            week_old_teams, _ = rank_teams(teams, df, today, last_week_calculated)
             old_ranks = week_old_teams['Rank']
             print(old_ranks)
             last_week_calculated = True
@@ -110,13 +110,13 @@ def load_results(df):
             update_results_nan(df, index, game)
 
     # Rank teams based on final ELO results
-    teams, df = rank_teams(teams, df, today)
+    teams, df = rank_teams(teams, df, today, last_week_calculated)
     teams['old_rank'] = old_ranks
     teams['Movement'] = teams['Rank'] - teams['old_rank']
     print(teams)
     return teams, df
 
-def rank_teams(teams, df, today):
+def rank_teams(teams, df, today, last_week_calculated):
     # Modify df to limit rankings to this school year
     if today < '07-01':
         lastYear = int(now.strftime("%Y")) - 1
@@ -127,6 +127,12 @@ def rank_teams(teams, df, today):
         nextYear = int(now.strftime("%Y")) + 1
         nextCutoff = str(nextYear) + "-07-01"
     pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) & (df.Score1>=0) & (df.Score2>=0)]
+    # Ensure recent games aren't included if last_week_calculated = False
+    if not last_week_calculated:
+        now = now.astimezone(pytz.timezone('US/Eastern'))
+        last_week = (now.strftime("%m-%d") - timedelta(days=7)).strftime("%m-%d")
+        pairwise_games =  pairwise_games.loc[(pairwise_games['Date'] <= last_week)]
+
     teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
