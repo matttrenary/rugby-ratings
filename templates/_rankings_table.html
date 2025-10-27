@@ -8,10 +8,12 @@
                   <col span="1" id="rank-col-3">
                   <col span="1" id="rank-col-4">
                   <col span="1" id="rank-col-5">
+                  <col span="1" id="rank-col-6">
                 </colgroup>
                 <thead class="table-dark">
                   <tr>
                       <th scope="col">Rank</th>
+                      <th scope="col" style="text-align: center">Δ7d</th>
                       <th scope="col">Team</th>
                       <th scope="col" style="text-align: center">W-L-T</th>
                       <th scope="col" style="text-align: center">Elo</th>
@@ -32,6 +34,23 @@
                     </tr>
                     <tr>
                       <td>{{ row["Rank"] }}</td>
+				{% if row["Movement"] > 0 %}
+                      <td style=
+					  "text-align: center; padding-top: 16px; padding-bottom: 8px; 
+					   background-size: 60%; background-repeat: no-repeat; 
+					   background-position: center; 
+					   background-image: url('assets/arrowUp.svg');"
+					>{{ row["Movement"] | abs }}</td>
+				{% elif row["Movement"] < 0 %}
+                      <td style=
+					  "text-align: center; padding-top: 8px; padding-bottom: 16px; 
+					   background-size: 60%; background-repeat: no-repeat; 
+					   background-position: center; 
+					   background-image: url('assets/arrowDown.svg');"
+					>{{ row["Movement"] | abs }}</td>
+				{% else %}
+                      <td></td>
+				{% endif %}
 				  <td><a href='/teams/{{ row["TeamLink"] }}.html{{ linkExt }}'
                         >{{ row["Team"] }}</a></td>
                       <td style="text-align: center">{{ row["WLT"] }}</td>
@@ -41,6 +60,23 @@
                   {% else %}
                     <tr>
                       <td>{{ row["Rank"] }}</td>
+				{% if row["Movement"] > 0 %}
+                      <td style=
+					  "text-align: center; padding-top: 16px; padding-bottom: 8px; 
+					   background-size: 60%; background-repeat: no-repeat; 
+					   background-position: center; 
+					   background-image: url('assets/arrowUp.svg');"
+					>{{ row["Movement"] | abs }}</td>
+				{% elif row["Movement"] < 0 %}
+                      <td style=
+					  "text-align: center; padding-top: 8px; padding-bottom: 16px; 
+					   background-size: 60%; background-repeat: no-repeat; 
+					   background-position: center; 
+					   background-image: url('assets/arrowDown.svg');"
+					>{{ row["Movement"] | abs }}</td>
+				{% else %}
+                      <td></td>
+				{% endif %}
 				  <td><a href='/teams/{{ row["TeamLink"] }}.html{{ linkExt }}'>{{ row["Team"] }}</a></td>
                       <td style="text-align: center">{{ row["WLT"] }}</td>
                       <td style="text-align: center">{{ row["Elo"] }}</td>

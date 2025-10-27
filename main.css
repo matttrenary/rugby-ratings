@@ -131,19 +131,22 @@ a {
 
 /* Fix column widths for tables */
 #rank-col-1 {
-  width: 10%;
+  width: 6%;
 }
 #rank-col-2 {
-  width: 40%;
+  width: 6%;
 }
 #rank-col-3 {
-  width: 20%;
+  width: 40%;
 }
 #rank-col-4 {
-  width: 15%;
+  width: 20%;
 }
 #rank-col-5 {
-  width: 15%;
+  width: 14%;
+}
+#rank-col-6 {
+  width: 14%;
 }
 #res-col-1 {
   width: 15%;
