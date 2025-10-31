@@ -109,6 +109,7 @@ def load_results(df):
     # Rank teams based on final ELO results
     teams = rank_teams(teams, df, today, last_week_calculated)
     teams['Movement'] = old_ranks - teams['Rank']
+    df = format_results(df)
     return teams, df
 
 def rank_teams(teams, df, today, last_week_calculated):
@@ -501,7 +502,7 @@ def rebuild_front(df_15s, df_7s):
     now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
 
     # Replace html on front page
-    with open('results.html', 'r+') as front_page:
+    with open('results.html', 'r+', encoding='utf-8') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
                                                'div',
                                                'recent_results_15s',
@@ -517,7 +518,7 @@ def rebuild_front(df_15s, df_7s):
         save_page('results.html', new_html)
 
 def save_page(page_name, content):
-    with open(page_name, "w+") as f:
+    with open(page_name, "w+", encoding='utf-8') as f:
         f.write(content)
 
 class Game:
