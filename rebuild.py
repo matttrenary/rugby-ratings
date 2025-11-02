@@ -108,7 +108,10 @@ def load_results(df):
 
     # Rank teams based on final ELO results
     teams = rank_teams(teams, df, today, last_week_calculated)
-    teams['Movement'] = old_ranks - teams['Rank']
+    if last_week_calculated:
+        teams['Movement'] = old_ranks - teams['Rank']
+    else:
+        teams['Movement'] = 0
     df = format_results(df)
     return teams, df
 
