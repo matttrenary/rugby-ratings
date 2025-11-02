@@ -58,32 +58,46 @@ def download_results(code):
     return df
 
 def load_results(df):
+    # Format dates
     df['Date'] = df['Date'].replace(r'^([1-9]/)', r'0\1', regex=True)
     df['Date'] = df['Date'].replace(r'/([1-9]/)', r'/0\1', regex=True)
     df['Date'] = pd.to_datetime(df['Date'], format="%m/%d/%y")
-    
     # Only games with two teams
     df = df[~(df.Team1.isnull()) & ~(df.Team2.isnull())].copy()
     df = df[(df.Team1!='') & (df.Team2!='')].copy()
-
     # Ensure scores are ints
     df.Score1 = df.Score1.replace('', np.nan).astype('Int64')
     df.Score2 = df.Score2.replace('', np.nan).astype('Int64')
-
-    ### Prepare teams ELO list
+    # Prepare teams ELO list
     teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
     teams = teams.drop_duplicates()
     teams['Elo'] = 1500.00
     teams['TeamLink'] = team_link(teams.Team)
     teams = teams.set_index('Team')
+    # Prepare columns for pairwise calculation
+    teams['Pairwise'] = 0
+    teams['WLT'] = "0-0-0"
 
     teams = qualify_teams(teams, df)
     # Set ineligible teams to a lower starting ELO
     teams[~teams['Eligible']] = teams[~teams['Eligible']].assign(Elo=1300)
 
+    # Determine date cutoffs
+    now = datetime.now()
+    now = now.astimezone(pytz.timezone('US/Eastern'))
+    today = now.strftime("%m-%d")
+    last_week =  (now - timedelta(days=7)).strftime("%Y-%m-%d")
+
+    # Iterate to calculate ELOs
+    last_week_calculated = False
     for index, row in df.iterrows():
+        # Once at lastWk, grab the week-old rankings
+        if row.Date.strftime("%Y-%m-%d") > last_week and not last_week_calculated:
+            week_old_teams = rank_teams(teams, df, today, last_week_calculated)
+            old_ranks = week_old_teams['Rank']
+            last_week_calculated = True
+
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
-        
         set_elo(game, teams)
 
         if not pd.isna(game.margin):
@@ -92,12 +106,19 @@ def load_results(df):
         else:
             update_results_nan(df, index, game)
 
-    teams['Pairwise'] = 0
-    teams['WLT'] = "0-0-0"
+    # Rank teams based on final ELO results
+    teams = rank_teams(teams, df, today, last_week_calculated)
+    if last_week_calculated:
+        teams['Movement'] = old_ranks - teams['Rank']
+    else:
+        teams['Movement'] = 0
+    df = format_results(df)
+    return teams, df
+
+def rank_teams(teams, df, today, last_week_calculated):
     # Modify df to limit rankings to this school year
     now = datetime.now()
     now = now.astimezone(pytz.timezone('US/Eastern'))
-    today = now.strftime("%m-%d")
     if today < '07-01':
         lastYear = int(now.strftime("%Y")) - 1
         lastCutoff = str(lastYear) + "-07-01"
@@ -106,20 +127,25 @@ def load_results(df):
         lastCutoff = now.strftime("%Y-07-01")
         nextYear = int(now.strftime("%Y")) + 1
         nextCutoff = str(nextYear) + "-07-01"
+    # Ensure recent games aren't included if last_week_calculated = False
+    if not last_week_calculated:
+        last_week = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+        pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
+                    (df['Date'] <= last_week) & (df.Score1>=0) & (df.Score2>=0)]
+    else:
+        pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
+                    (df.Score1>=0) & (df.Score2>=0)]
 
-    pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) & (df.Score1>=0) & (df.Score2>=0)]
     teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'Elo'], ascending=False).copy()
     # Catch Pairwise tiebreakers
     teams = pairwise_tiebreakers(teams, opponentsMatrix)
     teams = teams.sort_values(by=['Pairwise', 'Eligible', 'TiebreakPairwise', 'Elo'], ascending=False).copy()
+
     teams['Elo'] = teams['Elo'].round(0).astype(int)
-
     teams['Rank'] = range(1, len(teams) + 1)
-    df = format_results(df)
-
-    return teams, df
+    return teams
 
 def qualify_teams(teams, df):
     # Tally each team's number of games
@@ -479,7 +505,7 @@ def rebuild_front(df_15s, df_7s):
     now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
 
     # Replace html on front page
-    with open('results.html', 'r+') as front_page:
+    with open('results.html', 'r+', encoding='utf-8') as front_page:
         new_html = local_utils.replace_element(front_page.read(),
                                                'div',
                                                'recent_results_15s',
@@ -495,7 +521,7 @@ def rebuild_front(df_15s, df_7s):
         save_page('results.html', new_html)
 
 def save_page(page_name, content):
-    with open(page_name, "w+") as f:
+    with open(page_name, "w+", encoding='utf-8') as f:
         f.write(content)
 
 class Game:

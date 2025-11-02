@@ -8,10 +8,12 @@
                   <col span="1" id="rank-col-3">
                   <col span="1" id="rank-col-4">
                   <col span="1" id="rank-col-5">
+                  <col span="1" id="rank-col-6">
                 </colgroup>
                 <thead class="table-dark">
                   <tr>
                       <th scope="col">Rank</th>
+                      <th scope="col">Δ7d</th>
                       <th scope="col">Team</th>
                       <th scope="col" style="text-align: center">W-L-T</th>
                       <th scope="col" style="text-align: center">Elo</th>
@@ -32,6 +34,30 @@
                     </tr>
                     <tr>
                       <td>{{ row["Rank"] }}</td>
+				{% if row["Movement"] > 0 %}
+				  <td style="padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px; vertical-align: middle">
+			    	  <svg style="max-width: 100%; /* Ensure the SVG resizes */
+            				    height: auto; /* Maintain aspect ratio */" viewBox="0 0 15 15" version="1.1" id="triangle" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%">
+  				  <path id="path21090-9" fill="#7ADB7A" transform="rotate(0, 7.5, 7.5)" d="M7.5385,2&#xA;&#9;C7.2437,2,7.0502,2.1772,6.9231,2.3846l-5.8462,9.5385C1,12,1,12.1538,1,12.3077C1,12.8462,1.3846,13,1.6923,13h11.6154&#xA;&#9;C13.6923,13,14,12.8462,14,12.3077c0-0.1538,0-0.2308-0.0769-0.3846L8.1538,2.3846C8.028,2.1765,7.7882,2,7.5385,2z"/>
+  				  <text x="50%" dominant-baseline="middle" text-anchor="middle" style="color: #212529; font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
+  font-size: 0.3rem;
+  font-weight: 400;" y="60%">{{ row["Movement"] | abs }}</text>
+</svg>
+</td>
+				{% elif row["Movement"] < 0 %}
+
+				  <td style="padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px; vertical-align: middle">
+			    	  <svg style="max-width: 100%; /* Ensure the SVG resizes */
+            				    height: auto; /* Maintain aspect ratio */" viewBox="0 0 15 15" version="1.1" id="triangle" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%">
+  				  <path id="path21090-9" fill="lightcoral" transform="rotate(180, 7.5, 7.5)" d="M7.5385,2&#xA;&#9;C7.2437,2,7.0502,2.1772,6.9231,2.3846l-5.8462,9.5385C1,12,1,12.1538,1,12.3077C1,12.8462,1.3846,13,1.6923,13h11.6154&#xA;&#9;C13.6923,13,14,12.8462,14,12.3077c0-0.1538,0-0.2308-0.0769-0.3846L8.1538,2.3846C8.028,2.1765,7.7882,2,7.5385,2z"/>
+  				  <text x="50%" dominant-baseline="middle" text-anchor="middle" style="color: #212529; font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
+  font-size: 0.3rem;
+  font-weight: 400;" y="40%">{{ row["Movement"] | abs }}</text>
+</svg>
+</td>
+				{% else %}
+                      <td></td>
+				{% endif %}
 				  <td><a href='/teams/{{ row["TeamLink"] }}.html{{ linkExt }}'
                         >{{ row["Team"] }}</a></td>
                       <td style="text-align: center">{{ row["WLT"] }}</td>
@@ -41,6 +67,30 @@
                   {% else %}
                     <tr>
                       <td>{{ row["Rank"] }}</td>
+				{% if row["Movement"] > 0 %}
+				  <td style="padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px; vertical-align: middle">
+			    	  <svg style="max-width: 100%; /* Ensure the SVG resizes */
+            				    height: auto; /* Maintain aspect ratio */" viewBox="0 0 15 15" version="1.1" id="triangle" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%">
+  				  <path id="path21090-9" fill="#7ADB7A" transform="rotate(0, 7.5, 7.5)" d="M7.5385,2&#xA;&#9;C7.2437,2,7.0502,2.1772,6.9231,2.3846l-5.8462,9.5385C1,12,1,12.1538,1,12.3077C1,12.8462,1.3846,13,1.6923,13h11.6154&#xA;&#9;C13.6923,13,14,12.8462,14,12.3077c0-0.1538,0-0.2308-0.0769-0.3846L8.1538,2.3846C8.028,2.1765,7.7882,2,7.5385,2z"/>
+  				  <text x="50%" dominant-baseline="middle" text-anchor="middle" style="color: #212529; font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
+  font-size: 0.3rem;
+  font-weight: 400;" y="60%">{{ row["Movement"] | abs }}</text>
+</svg>
+</td>
+				{% elif row["Movement"] < 0 %}
+
+				  <td style="padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px; vertical-align: middle">
+			    	  <svg style="max-width: 100%; /* Ensure the SVG resizes */
+            				    height: auto; /* Maintain aspect ratio */" viewBox="0 0 15 15" version="1.1" id="triangle" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%">
+  				  <path id="path21090-9" fill="lightcoral" transform="rotate(180, 7.5, 7.5)" d="M7.5385,2&#xA;&#9;C7.2437,2,7.0502,2.1772,6.9231,2.3846l-5.8462,9.5385C1,12,1,12.1538,1,12.3077C1,12.8462,1.3846,13,1.6923,13h11.6154&#xA;&#9;C13.6923,13,14,12.8462,14,12.3077c0-0.1538,0-0.2308-0.0769-0.3846L8.1538,2.3846C8.028,2.1765,7.7882,2,7.5385,2z"/>
+  				  <text x="50%" dominant-baseline="middle" text-anchor="middle" style="color: #212529; font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
+  font-size: 0.3rem;
+  font-weight: 400;" y="40%">{{ row["Movement"] | abs }}</text>
+</svg>
+</td>
+				{% else %}
+                      <td></td>
+				{% endif %}
 				  <td><a href='/teams/{{ row["TeamLink"] }}.html{{ linkExt }}'>{{ row["Team"] }}</a></td>
                       <td style="text-align: center">{{ row["WLT"] }}</td>
                       <td style="text-align: center">{{ row["Elo"] }}</td>

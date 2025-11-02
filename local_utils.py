@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
+import sys
 
 def replace_element(html, element_type, id, new_html):
     """Replaces a specific element within an html block with new html
@@ -44,6 +45,11 @@ def load_range(df, days_num_back, days_num_forward):
 
     # Restyle Date column
     df.Date = pd.to_datetime(df.Date)
-    df.Date = df.Date.dt.strftime('%b %-d, %Y')
+    if sys.platform.startswith('win'):
+        # Code for Windows OS goes here
+        df.Date = df.Date.dt.strftime('%b %e, %Y')
+    else:
+        # Code for MacOS (Darwin), as well as other other systems, goes here
+        df.Date = df.Date.dt.strftime('%b %-d, %Y')
 
     return df
