@@ -153,9 +153,9 @@ def rank_teams(teams, df, today, last_week_calculated):
                     (df.Score1>=0) & (df.Score2>=0)]
 
     # Disqualify idle teams
-    for team in list(teams['Team']):
+    for team in list(teams.index):
         if team not in list(active_games['Team1']) and team not in list(active_games['Team2']):
-            teams.loc[teams['Team'] == team, 'Eligible'] = False
+            teams.loc[team, 'Eligible'] = False
 
     teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
