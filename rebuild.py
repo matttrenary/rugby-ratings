@@ -120,21 +120,42 @@ def rank_teams(teams, df, today, last_week_calculated):
     now = datetime.now()
     now = now.astimezone(pytz.timezone('US/Eastern'))
     if today < '07-01':
+        # backYear and backCutoff assist with disqualifying idle teams
+        backYear = int(now.strftime("%Y")) - 2
         lastYear = int(now.strftime("%Y")) - 1
+        backCutoff = str(backYear) + "-07-01"
         lastCutoff = str(lastYear) + "-07-01"
         nextCutoff = now.strftime("%Y-07-01")
     else:
+        # backYear and backCutoff assist with disqualifying idle teams
+        backYear = int(now.strftime("%Y")) - 1
+        backCutoff = str(backYear) + "-07-01"
         lastCutoff = now.strftime("%Y-07-01")
         nextYear = int(now.strftime("%Y")) + 1
         nextCutoff = str(nextYear) + "-07-01"
+
     # Ensure recent games aren't included if last_week_calculated = False
     if not last_week_calculated:
         last_week = (now - timedelta(days=7)).strftime("%Y-%m-%d")
         pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
                     (df['Date'] <= last_week) & (df.Score1>=0) & (df.Score2>=0)]
+
+        # Choose games that determine idle teams
+        active_games =  df.loc[(df['Date'] >= backCutoff) & (df['Date'] < nextCutoff) &
+                        (df['Date'] <= last_week) & (df.Score1>=0) & (df.Score2>=0)]
+
     else:
         pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
                     (df.Score1>=0) & (df.Score2>=0)]
+
+        # Choose games that determine idle teams
+        active_games =  df.loc[(df['Date'] >= backCutoff) & (df['Date'] < nextCutoff) &
+                    (df.Score1>=0) & (df.Score2>=0)]
+
+    # Disqualify idle teams
+    for team in list(teams['Team']):
+        if team not in list(active_games['Team1']) and team not in list(active_games['Team2']):
+            teams.loc[teams['Team'] == team, 'Eligible'] = False
 
     teams, opponentsMatrix = calculate_pairwise(teams[teams['Eligible']], teams, pairwise_games)
 
