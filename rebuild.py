@@ -357,25 +357,19 @@ class SiteGenerator:
         template_loader = jinja2.FileSystemLoader(searchpath="./templates/")
         self.env = jinja2.Environment(loader=template_loader)
 
+    def _format_timestamp(self):
+        now = datetime.now().astimezone(pytz.timezone('US/Eastern'))
+        if sys.platform.startswith('win'):
+            return now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+        return now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+
     def generate_page(self, content, template_file, **kwargs):
         """Generate site in local directory"""
         template = self.env.get_template(template_file)
-
-        now = datetime.now()
-        now = now.astimezone(pytz.timezone('US/Eastern'))
-        if sys.platform.startswith('win'):
-            # Code for Windows OS goes here
-            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
-        else:
-            # Code for MacOS (Darwin), as well as other other systems, goes here
-            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
-
-        return template.render(data=content, timestamp=now, **kwargs)
+        return template.render(data=content, timestamp=self._format_timestamp(), **kwargs)
 
     def generate_from_df(self, df, template_file, id, **kwargs):
-        data = []
-        for index, row in df.iterrows():
-            data = data + [row.to_dict()]
+        data = df.to_dict('records')
 
         if id[-2:] == '7s':
             linkExt = '#7s'
@@ -419,15 +413,7 @@ class SiteGenerator:
                                         id='recent_results_7s',
                                         active='show active')
 
-        now = datetime.now()
-        now = now.astimezone(pytz.timezone('US/Eastern'))
-        if sys.platform.startswith('win'):
-            # Code for Windows OS goes here
-            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
-        else:
-            # Code for MacOS (Darwin), as well as other other systems, goes here
-            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
-        now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
+        now = f'<p id="results_timestamp" style="text-align: center;">All information as of {self._format_timestamp()}</p>'
 
         # Replace html on front page
         with open('results.html', 'r+', encoding='utf-8') as front_page:
@@ -462,10 +448,7 @@ class Game:
         self.calc_winloss()
 
     def calc_margin(self):
-        try:
-            self.score1 >= 0
-            self.score2 >= 0
-        except:
+        if pd.isna(self.score1) or pd.isna(self.score2):
             self.margin = np.nan
         else:
             self.margin = abs(self.score1 - self.score2)
