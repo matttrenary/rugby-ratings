@@ -359,47 +359,24 @@ def update_results_nan(df, index, game):
     df.loc[index, 'adjust1'] = np.nan
     df.loc[index, 'adjust2'] = np.nan
 
+def format_adjustment(val):
+    try:
+        n = int(round(float(val)))
+        return str(n) if n < 1 else f'+{n}'
+    except (ValueError, TypeError):
+        return ''
+
 def format_results(df):
-    # Prep for turning numeric columns to strs
-    df['adjust1'] = df['adjust1'].astype('string')
-    df['adjust2'] = df['adjust2'].astype('string')
-    df['Score1'] = df['Score1'].astype('string')
-    df['Score2'] = df['Score2'].astype('string')
-
-    # Don't like this long-term
-    for index, row in df.iterrows():
-        try:
-            df.loc[index, 'elo1'] = int(round(row.elo1))
-            df.loc[index, 'elo2'] = int(round(row.elo2))
-        except:
-            None
-        
-        try:
-            df.loc[index, 'rn1'] = int(round(row.rn1))
-            df.loc[index, 'rn2'] = int(round(row.rn2))
-        except:
-            None
-
-        try:
-            if round(float(row.adjust1)) < 1:
-                df.loc[index, 'adjust1'] = str(int(round(float(row.adjust1))))
-            else:
-                df.loc[index, 'adjust1'] = '+' + str(int(round(float(row.adjust1))))
-            
-            if round(float(row.adjust2)) < 1:
-                df.loc[index, 'adjust2'] = str(int(round(float(row.adjust2))))
-            else:
-                df.loc[index, 'adjust2'] = '+' + str(int(round(float(row.adjust2))))
-        except:
-            None
-
     df['elo1'] = df['elo1'].round(0).astype(int)
     df['elo2'] = df['elo2'].round(0).astype(int)
+    df['rn1'] = pd.to_numeric(df['rn1'], errors='coerce').round(0).astype('Int64')
+    df['rn2'] = pd.to_numeric(df['rn2'], errors='coerce').round(0).astype('Int64')
 
-    df.adjust1 = df.adjust1.fillna('')
-    df.adjust2 = df.adjust2.fillna('')
-    df.Score1 = df.Score1.fillna('')
-    df.Score2 = df.Score2.fillna('')
+    df['adjust1'] = df['adjust1'].apply(format_adjustment)
+    df['adjust2'] = df['adjust2'].apply(format_adjustment)
+
+    df['Score1'] = df['Score1'].astype('string').fillna('')
+    df['Score2'] = df['Score2'].astype('string').fillna('')
     
     df['Team1Link'] = team_link(df.Team1)
     df['Team2Link'] = team_link(df.Team2)
