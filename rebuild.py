@@ -19,27 +19,6 @@ import local_utils
 
 workbook_name = "College Rugby Results"
 
-def parse_arguments():
-    """Parse arguments when executed from CLI"""
-    parser = argparse.ArgumentParser(
-        prog="calc-elo",
-        description="CLI tool to calculate Elo ratings from game results",
-    )
-    parser.add_argument(
-        "--code",
-        choices=["15s", "7s", "both"],
-        default="both",
-        help="15s or 7s results",
-    )
-    parser.add_argument(
-        "--refresh",
-        choices=["all", "new"],
-        default="new",
-        help="all past games or only those without ratings",
-    )
-    args = parser.parse_args()
-    return args
-
 def download_results(code):
     """Download results using the Google Sheets API"""
 
