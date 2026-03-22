@@ -4,22 +4,43 @@ Created on Thu Nov 17 14:24:45 2022
 
 @author: trenary
 """
+import pytz
 import local_utils
+from datetime import datetime, timedelta
 from site_generator import SiteGenerator
 from data import download_results, clean_results, format_results
-from pwr import rank_teams
-from elo import init_teams, run_elo_loop
+from pwr import qualify_teams, rank_teams
+from elo import init_teams, run_elo_loop, INELIGIBLE_ELO
+
+
+def _prepare_teams(df, teams):
+    teams = qualify_teams(teams, df)
+    teams.loc[~teams['Eligible'], 'Elo'] = INELIGIBLE_ELO
+    return teams
+
+
+def _get_old_ranks(teams, df, today, last_week):
+    teams_snap = teams.copy()
+    df_before = df[df['Date'].dt.strftime("%Y-%m-%d") <= last_week].copy()
+    run_elo_loop(df_before, teams_snap)
+    return rank_teams(teams_snap, df, today, False)['Rank']
 
 
 def main():
     site = SiteGenerator()
 
+    now = datetime.now().astimezone(pytz.timezone('US/Eastern'))
+    today = now.strftime("%m-%d")
+    last_week = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+
     # 15s
     df_15s = download_results('15s')
     df_15s = clean_results(df_15s)
-    teams_15s = init_teams(df_15s)
-    teams_15s, df_15s, today_15s, lwc_15s, old_ranks_15s = run_elo_loop(df_15s, teams_15s)
-    rankings15s = rank_teams(teams_15s, df_15s, today_15s, lwc_15s)
+    teams_15s = _prepare_teams(df_15s, init_teams(df_15s))
+    lwc_15s = df_15s['Date'].dt.strftime("%Y-%m-%d").gt(last_week).any()
+    old_ranks_15s = _get_old_ranks(teams_15s, df_15s, today, last_week) if lwc_15s else None
+    teams_15s, df_15s = run_elo_loop(df_15s, teams_15s)
+    rankings15s = rank_teams(teams_15s, df_15s, today, lwc_15s)
     rankings15s['Movement'] = old_ranks_15s - rankings15s['Rank'] if lwc_15s else 0
     results15s = format_results(df_15s)
     rankings15s = rankings15s.reset_index().copy()
@@ -32,9 +53,11 @@ def main():
     # 7s
     df_7s = download_results('7s')
     df_7s = clean_results(df_7s)
-    teams_7s = init_teams(df_7s)
-    teams_7s, df_7s, today_7s, lwc_7s, old_ranks_7s = run_elo_loop(df_7s, teams_7s)
-    rankings7s = rank_teams(teams_7s, df_7s, today_7s, lwc_7s)
+    teams_7s = _prepare_teams(df_7s, init_teams(df_7s))
+    lwc_7s = df_7s['Date'].dt.strftime("%Y-%m-%d").gt(last_week).any()
+    old_ranks_7s = _get_old_ranks(teams_7s, df_7s, today, last_week) if lwc_7s else None
+    teams_7s, df_7s = run_elo_loop(df_7s, teams_7s)
+    rankings7s = rank_teams(teams_7s, df_7s, today, lwc_7s)
     rankings7s['Movement'] = old_ranks_7s - rankings7s['Rank'] if lwc_7s else 0
     results7s = format_results(df_7s)
     rankings7s = rankings7s.reset_index().copy()
