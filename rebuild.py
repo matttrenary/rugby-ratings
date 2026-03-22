@@ -352,100 +352,102 @@ def team_link(series):
     series = series.str.replace(')','', regex=False)
     return series
 
-def generate_from_df(df, template_file, id, **kwargs):
-    data = []
-    for index, row in df.iterrows():
-        data = data + [row.to_dict()]
+class SiteGenerator:
+    def __init__(self):
+        template_loader = jinja2.FileSystemLoader(searchpath="./templates/")
+        self.env = jinja2.Environment(loader=template_loader)
 
-    if id[-2:] == '7s':
-        linkExt = '#7s'
-    else:
-        linkExt = ''
+    def generate_page(self, content, template_file, **kwargs):
+        """Generate site in local directory"""
+        template = self.env.get_template(template_file)
 
-    return(generate_page(data, template_file, id=id, linkExt=linkExt, **kwargs))
+        now = datetime.now()
+        now = now.astimezone(pytz.timezone('US/Eastern'))
+        if sys.platform.startswith('win'):
+            # Code for Windows OS goes here
+            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+        else:
+            # Code for MacOS (Darwin), as well as other other systems, goes here
+            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
 
-def generate_page(content, template_file, **kwargs):
-    """Generate site in local directory"""
+        return template.render(data=content, timestamp=now, **kwargs)
 
-    template_loader = jinja2.FileSystemLoader(searchpath="./templates/")
-    template_env = jinja2.Environment(loader=template_loader)
-    template = template_env.get_template(template_file)
+    def generate_from_df(self, df, template_file, id, **kwargs):
+        data = []
+        for index, row in df.iterrows():
+            data = data + [row.to_dict()]
 
-    now = datetime.now()
-    now = now.astimezone(pytz.timezone('US/Eastern'))
-    if sys.platform.startswith('win'):
-        # Code for Windows OS goes here
-        now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
-    else:
-        # Code for MacOS (Darwin), as well as other other systems, goes here
-        now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+        if id[-2:] == '7s':
+            linkExt = '#7s'
+        else:
+            linkExt = ''
 
-    return(template.render(data=content, timestamp=now, **kwargs))
+        return self.generate_page(data, template_file, id=id, linkExt=linkExt, **kwargs)
 
-def generate_teams(team15s, team7s, results15s, results7s):
-    teams = pd.concat([team15s, team7s]).drop_duplicates()
+    def generate_teams(self, team15s, team7s, results15s, results7s):
+        teams = pd.concat([team15s, team7s]).drop_duplicates()
 
-    for index, row in teams.iterrows():
-        
-        games15s = results15s[(results15s.Team1==row.Team) | (results15s.Team2==row.Team)].copy()
-        body15s = generate_from_df(games15s,
-                                   "_results_table.html",
-                                   id='results15s',
-                                   title=f'{row.Team} 15s Results',
-                                   active='show active')
+        for index, row in teams.iterrows():
 
-        games7s = results7s[(results7s.Team1==row.Team) | (results7s.Team2==row.Team)].copy()
-        body7s = generate_from_df(games7s,
-                                  "_results_table.html",
-                                  id='results7s',
-                                  title=f'{row.Team} 7s Results')
+            games15s = results15s[(results15s.Team1==row.Team) | (results15s.Team2==row.Team)].copy()
+            body15s = self.generate_from_df(games15s,
+                                            "_results_table.html",
+                                            id='results15s',
+                                            title=f'{row.Team} 15s Results',
+                                            active='show active')
 
-        content = body15s + body7s
-        content = generate_page(content, 'team_template.html', content_title=row.Team)
+            games7s = results7s[(results7s.Team1==row.Team) | (results7s.Team2==row.Team)].copy()
+            body7s = self.generate_from_df(games7s,
+                                           "_results_table.html",
+                                           id='results7s',
+                                           title=f'{row.Team} 7s Results')
 
-        page_name = 'teams/' + row.TeamLink + '.html'
-        save_page(page_name, content)
+            content = body15s + body7s
+            content = self.generate_page(content, 'team_template.html', content_title=row.Team)
 
-def rebuild_front(df_15s, df_7s):
-    # Generate table
-    body_15s = generate_from_df(df_15s,
-                            '_results_table.html',
-                            id='recent_results_15s',
-                            active='show active')
-    body_7s = generate_from_df(df_7s,
-                            '_results_table.html',
-                            id='recent_results_7s',
-                            active='show active')
+            page_name = 'teams/' + row.TeamLink + '.html'
+            self.save_page(page_name, content)
 
-    now = datetime.now()
-    now = now.astimezone(pytz.timezone('US/Eastern'))
-    if sys.platform.startswith('win'):
-        # Code for Windows OS goes here
-        now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
-    else:
-        # Code for MacOS (Darwin), as well as other other systems, goes here
-        now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
-    now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
+    def rebuild_front(self, df_15s, df_7s):
+        # Generate table
+        body_15s = self.generate_from_df(df_15s,
+                                         '_results_table.html',
+                                         id='recent_results_15s',
+                                         active='show active')
+        body_7s = self.generate_from_df(df_7s,
+                                        '_results_table.html',
+                                        id='recent_results_7s',
+                                        active='show active')
 
-    # Replace html on front page
-    with open('results.html', 'r+', encoding='utf-8') as front_page:
-        new_html = local_utils.replace_element(front_page.read(),
-                                               'div',
-                                               'recent_results_15s',
-                                               body_15s)
-        new_html = local_utils.replace_element(new_html,
-                                               'div',
-                                               'recent_results_7s',
-                                               body_7s)
-        new_html = local_utils.replace_element(new_html,
-                                               'p',
-                                               'results_timestamp',
-                                               now)
-        save_page('results.html', new_html)
+        now = datetime.now()
+        now = now.astimezone(pytz.timezone('US/Eastern'))
+        if sys.platform.startswith('win'):
+            # Code for Windows OS goes here
+            now = now.strftime("%#I:%M %p on %h %#d, %Y %Z")
+        else:
+            # Code for MacOS (Darwin), as well as other other systems, goes here
+            now = now.strftime("%-I:%M %p on %h %-d, %Y %Z")
+        now = f'<p id="results_timestamp" style="text-align: center;">All information as of {now}</p>'
 
-def save_page(page_name, content):
-    with open(page_name, "w+", encoding='utf-8') as f:
-        f.write(content)
+        # Replace html on front page
+        with open('results.html', 'r+', encoding='utf-8') as front_page:
+            new_html = local_utils.replace_element(front_page.read(),
+                                                   'div',
+                                                   'recent_results_15s',
+                                                   body_15s)
+            new_html = local_utils.replace_element(new_html,
+                                                   'div',
+                                                   'recent_results_7s',
+                                                   body_7s)
+            new_html = local_utils.replace_element(new_html,
+                                                   'p',
+                                                   'results_timestamp',
+                                                   now)
+            self.save_page('results.html', new_html)
+
+    def save_page(self, page_name, content):
+        with open(page_name, "w+", encoding='utf-8') as f:
+            f.write(content)
 
 class Game:
     def __init__(self, team1, score1, team2, score2, neutral, additional):
@@ -535,39 +537,41 @@ class Game:
         df.loc[index, 'adjust2'] = np.nan
 
 def main():
+    site = SiteGenerator()
+
     # 15s
     games15s = download_results('15s')
     rankings15s, results15s = load_results(games15s)
     rankings15s = rankings15s.reset_index().copy()
 
-    body_rankings15s = generate_from_df(rankings15s,
-                                        '_rankings_table.html',
-                                        id='rankings15s',
-                                        active='show active')
+    body_rankings15s = site.generate_from_df(rankings15s,
+                                             '_rankings_table.html',
+                                             id='rankings15s',
+                                             active='show active')
 
     # 7s
     games7s = download_results('7s')
     rankings7s, results7s = load_results(games7s)
     rankings7s = rankings7s.reset_index().copy()
 
-    body_rankings7s = generate_from_df(rankings7s,
-                                        '_rankings_table.html',
-                                        id='rankings7s')
+    body_rankings7s = site.generate_from_df(rankings7s,
+                                            '_rankings_table.html',
+                                            id='rankings7s')
 
     # Rankings
     body_rankings = body_rankings15s + body_rankings7s
-    content_rankings = generate_page(body_rankings,
-                                    'rankings_template.html',
-                                    content_title='Division 1 College Rugby Rankings')
-    save_page('index.html', content_rankings)
+    content_rankings = site.generate_page(body_rankings,
+                                          'rankings_template.html',
+                                          content_title='Division 1 College Rugby Rankings')
+    site.save_page('index.html', content_rankings)
 
     # Team pages
-    generate_teams(rankings15s, rankings7s, results15s, results7s)
+    site.generate_teams(rankings15s, rankings7s, results15s, results7s)
 
     # Update frontpage with recent results
     game_subset_15s = local_utils.load_range(results15s, 2, 2)
     game_subset_7s = local_utils.load_range(results7s, 2, 2)
-    rebuild_front(game_subset_15s, game_subset_7s)
+    site.rebuild_front(game_subset_15s, game_subset_7s)
 
 if __name__ == "__main__":
     main()
