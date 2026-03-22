@@ -94,6 +94,12 @@ def load_results(df):
     df = format_results(df)
     return teams, df
 
+def filter_games(df, start, end, upper=None):
+    mask = (df['Date'] >= start) & (df['Date'] < end) & (df.Score1 >= 0) & (df.Score2 >= 0)
+    if upper is not None:
+        mask &= df['Date'] <= upper
+    return df.loc[mask]
+
 def rank_teams(teams, df, today, last_week_calculated):
     # Work on a copy so mutations don't bleed back to the caller between calls
     teams = teams.copy()
@@ -117,22 +123,9 @@ def rank_teams(teams, df, today, last_week_calculated):
         nextCutoff = str(nextYear) + "-07-01"
 
     # Ensure recent games aren't included if last_week_calculated = False
-    if not last_week_calculated:
-        last_week = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-        pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
-                    (df['Date'] <= last_week) & (df.Score1>=0) & (df.Score2>=0)]
-
-        # Choose games that determine idle teams
-        active_games =  df.loc[(df['Date'] >= backCutoff) & (df['Date'] < nextCutoff) &
-                        (df['Date'] <= last_week) & (df.Score1>=0) & (df.Score2>=0)]
-
-    else:
-        pairwise_games =  df.loc[(df['Date'] >= lastCutoff) & (df['Date'] < nextCutoff) &
-                    (df.Score1>=0) & (df.Score2>=0)]
-
-        # Choose games that determine idle teams
-        active_games =  df.loc[(df['Date'] >= backCutoff) & (df['Date'] < nextCutoff) &
-                    (df.Score1>=0) & (df.Score2>=0)]
+    upper = (now - timedelta(days=7)).strftime("%Y-%m-%d") if not last_week_calculated else None
+    pairwise_games = filter_games(df, lastCutoff, nextCutoff, upper)
+    active_games = filter_games(df, backCutoff, nextCutoff, upper)
 
     # Disqualify idle teams
     for team in list(teams.index):
