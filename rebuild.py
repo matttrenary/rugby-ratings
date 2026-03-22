@@ -4,35 +4,24 @@ Created on Thu Nov 17 14:24:45 2022
 
 @author: trenary
 """
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import pytz
 import local_utils
-from game import Game
 from site_generator import SiteGenerator
-from data import download_results, clean_results, format_results, format_adjustment, team_link
+from data import download_results, clean_results, format_results
 from pwr import rank_teams
 from elo import init_teams, run_elo_loop
 
-def load_results(df):
-    df = clean_results(df)
-    teams = init_teams(df)
-    teams, df, today, last_week_calculated, old_ranks = run_elo_loop(df, teams)
-    teams = rank_teams(teams, df, today, last_week_calculated)
-    if last_week_calculated:
-        teams['Movement'] = old_ranks - teams['Rank']
-    else:
-        teams['Movement'] = 0
-    df = format_results(df)
-    return teams, df
 
 def main():
     site = SiteGenerator()
 
     # 15s
-    games15s = download_results('15s')
-    rankings15s, results15s = load_results(games15s)
+    df_15s = download_results('15s')
+    df_15s = clean_results(df_15s)
+    teams_15s = init_teams(df_15s)
+    teams_15s, df_15s, today_15s, lwc_15s, old_ranks_15s = run_elo_loop(df_15s, teams_15s)
+    rankings15s = rank_teams(teams_15s, df_15s, today_15s, lwc_15s)
+    rankings15s['Movement'] = old_ranks_15s - rankings15s['Rank'] if lwc_15s else 0
+    results15s = format_results(df_15s)
     rankings15s = rankings15s.reset_index().copy()
 
     body_rankings15s = site.generate_from_df(rankings15s,
@@ -41,8 +30,13 @@ def main():
                                              active='show active')
 
     # 7s
-    games7s = download_results('7s')
-    rankings7s, results7s = load_results(games7s)
+    df_7s = download_results('7s')
+    df_7s = clean_results(df_7s)
+    teams_7s = init_teams(df_7s)
+    teams_7s, df_7s, today_7s, lwc_7s, old_ranks_7s = run_elo_loop(df_7s, teams_7s)
+    rankings7s = rank_teams(teams_7s, df_7s, today_7s, lwc_7s)
+    rankings7s['Movement'] = old_ranks_7s - rankings7s['Rank'] if lwc_7s else 0
+    results7s = format_results(df_7s)
     rankings7s = rankings7s.reset_index().copy()
 
     body_rankings7s = site.generate_from_df(rankings7s,
