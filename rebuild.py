@@ -186,6 +186,38 @@ def qualify_teams(teams, df):
     return teams
 
 
+def pairwise_wins(team, opponent, opponentsMatrix, teams):
+    """Return True if team wins the 3-criteria pairwise comparison against opponent."""
+    completeTeams = list(teams.index.values)
+
+    # Criteria 1: Head to Head
+    wlt = opponentsMatrix[team][opponent]
+    if wlt[0] > wlt[1]:
+        return True
+    elif wlt[0] < wlt[1]:
+        return False
+
+    # Criteria 2: Common Opponents
+    teamWinPct = 0
+    oppoWinPct = 0
+    for common in completeTeams:
+        teamWLT = opponentsMatrix[team][common]
+        oppoWLT = opponentsMatrix[opponent][common]
+        if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
+            continue
+        teamGs = teamWLT[0] + teamWLT[1] + teamWLT[2]
+        teamWinPct = teamWinPct + (teamWLT[0] + 0.5 * teamWLT[2]) / teamGs
+        oppoGs = oppoWLT[0] + oppoWLT[1] + oppoWLT[2]
+        oppoWinPct = oppoWinPct + (oppoWLT[0] + 0.5 * oppoWLT[2]) / oppoGs
+    if teamWinPct > oppoWinPct:
+        return True
+    elif teamWinPct < oppoWinPct:
+        return False
+
+    # Criteria 3: ELO
+    return teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']
+
+
 def calculate_pairwise(teams, allTeams, df):
     # Create matrix containing: teams > opponents > WLT vs that opponent
     eligibleTeams = list(teams.index.values)
@@ -224,32 +256,7 @@ def calculate_pairwise(teams, allTeams, df):
         for opponent in eligibleTeams:
             if opponent == team:
                 continue
-            # Criteria 1: Head to Head
-            wlt = opponents[opponent]
-            if wlt[0] > wlt[1]:
-                allTeams.loc[team, 'Pairwise'] += 1
-                continue
-            elif wlt[0] < wlt[1]:
-                continue
-            # Criteria 2: Common Opponents
-            teamWinPct = 0
-            oppoWinPct = 0
-            for common in completeTeams:
-                teamWLT = opponentsMatrix[team][common]
-                oppoWLT = opponentsMatrix[opponent][common]
-                if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
-                    continue
-                teamGs = teamWLT[0] + teamWLT[1] + teamWLT[2]
-                teamWinPct = teamWinPct + (teamWLT[0] + 0.5 * teamWLT[2]) / teamGs
-                oppoGs = oppoWLT[0] + oppoWLT[1] + oppoWLT[2]
-                oppoWinPct = oppoWinPct + (oppoWLT[0] + 0.5 * oppoWLT[2]) / oppoGs
-            if teamWinPct > oppoWinPct:
-                allTeams.loc[team, 'Pairwise'] += 1
-                continue
-            elif teamWinPct < oppoWinPct:
-                continue
-            # Criteria 3: ELO
-            if teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']:
+            if pairwise_wins(team, opponent, opponentsMatrix, allTeams):
                 allTeams.loc[team, 'Pairwise'] += 1
     # Output complete teams.Pairwise column
     return allTeams, opponentsMatrix
@@ -275,32 +282,7 @@ def pairwise_tiebreakers(teams, opponentsMatrix):
             for opponent in teamsTied:
                 if opponent == team:
                     continue
-                # Criteria 1: Head to Head
-                wlt = opponentsMatrix[team][opponent]
-                if wlt[0] > wlt[1]:
-                    teams.loc[team, 'TiebreakPairwise'] += 1
-                    continue
-                elif wlt[0] < wlt[1]:
-                    continue
-                # Criteria 2: Common Opponents
-                teamWinPct = 0
-                oppoWinPct = 0
-                for common in completeTeams:
-                    teamWLT = opponentsMatrix[team][common]
-                    oppoWLT = opponentsMatrix[opponent][common]
-                    if (teamWLT == [0,0,0]) or (oppoWLT == [0,0,0]):
-                        continue
-                    teamGs = teamWLT[0] + teamWLT[1] + teamWLT[2]
-                    teamWinPct = teamWinPct + (teamWLT[0] + 0.5 * teamWLT[2]) / teamGs
-                    oppoGs = oppoWLT[0] + oppoWLT[1] + oppoWLT[2]
-                    oppoWinPct = oppoWinPct + (oppoWLT[0] + 0.5 * oppoWLT[2]) / oppoGs
-                if teamWinPct > oppoWinPct:
-                    teams.loc[team, 'TiebreakPairwise'] += 1
-                    continue
-                elif teamWinPct < oppoWinPct:
-                    continue
-                # Criteria 3: ELO
-                if teams.loc[team, 'Elo'] > teams.loc[opponent, 'Elo']:
+                if pairwise_wins(team, opponent, opponentsMatrix, teams):
                     teams.loc[team, 'TiebreakPairwise'] += 1
         # Reset variables in order to continue iterating
         i = j + 1
