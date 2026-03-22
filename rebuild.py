@@ -12,49 +12,13 @@ import local_utils
 from game import Game
 from site_generator import SiteGenerator
 from data import download_results, clean_results, format_results, format_adjustment, team_link
-from pwr import qualify_teams, rank_teams, filter_games, calculate_pairwise, pairwise_wins, pairwise_tiebreakers
+from pwr import rank_teams
+from elo import init_teams, run_elo_loop
 
 def load_results(df):
     df = clean_results(df)
-    # Prepare teams ELO list
-    teams = pd.concat([df.Team1, df.Team2]).rename('Team').to_frame()
-    teams = teams.drop_duplicates()
-    teams['Elo'] = 1500.00
-    teams['TeamLink'] = team_link(teams.Team)
-    teams = teams.set_index('Team')
-    # Prepare columns for pairwise calculation
-    teams['Pairwise'] = 0
-    teams['WLT'] = "0-0-0"
-
-    teams = qualify_teams(teams, df)
-    # Set ineligible teams to a lower starting ELO
-    teams[~teams['Eligible']] = teams[~teams['Eligible']].assign(Elo=1300)
-
-    # Determine date cutoffs
-    now = datetime.now()
-    now = now.astimezone(pytz.timezone('US/Eastern'))
-    today = now.strftime("%m-%d")
-    last_week =  (now - timedelta(days=7)).strftime("%Y-%m-%d")
-
-    # Iterate to calculate ELOs
-    last_week_calculated = False
-    for index, row in df.iterrows():
-        # Once at lastWk, grab the week-old rankings
-        if row.Date.strftime("%Y-%m-%d") > last_week and not last_week_calculated:
-            week_old_teams = rank_teams(teams, df, today, last_week_calculated)
-            old_ranks = week_old_teams['Rank']
-            last_week_calculated = True
-
-        game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
-        game.set_elo(teams)
-
-        if not pd.isna(game.margin):
-            game.calculate_elo(teams)
-            game.update_results(df, index)
-        else:
-            game.update_results_nan(df, index)
-
-    # Rank teams based on final ELO results
+    teams = init_teams(df)
+    teams, df, today, last_week_calculated, old_ranks = run_elo_loop(df, teams)
     teams = rank_teams(teams, df, today, last_week_calculated)
     if last_week_calculated:
         teams['Movement'] = old_ranks - teams['Rank']
