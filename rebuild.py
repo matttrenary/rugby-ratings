@@ -77,13 +77,13 @@ def load_results(df):
             last_week_calculated = True
 
         game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
-        set_elo(game, teams)
+        game.set_elo(teams)
 
         if not pd.isna(game.margin):
-            calculate_elo(game, teams)
-            update_results(df, index, game)
+            game.calculate_elo(teams)
+            game.update_results(df, index)
         else:
-            update_results_nan(df, index, game)
+            game.update_results_nan(df, index)
 
     # Rank teams based on final ELO results
     teams = rank_teams(teams, df, today, last_week_calculated)
@@ -185,32 +185,6 @@ def qualify_teams(teams, df):
         teams.loc[team, 'Eligible'] = True
     return teams
 
-def set_elo(game, teams):
-    game.elo1 = teams.loc[game.team1, 'Elo']
-    game.elo2 = teams.loc[game.team2, 'Elo']
-
-def calculate_elo(game, teams):
-    # Elo coefficients
-    k = 40
-    x = 2 if game.margin == 0 else 1
-    margin_coef = np.log(game.margin + x)
-    if game.neutral != 'Yes':
-        game.home_coef = 75
-
-    # Auto correlation coefficient
-    game.autocor = autocor(game)
-
-    rdiff = game.elo2 - (game.elo1 + game.home_coef)
-    we = 1/(10**(rdiff/400)+1)
-
-    game.adjust1 = k*margin_coef*game.autocor*(game.win1-we)
-    game.adjust2 = -1*game.adjust1
-
-    game.rn1 = game.elo1 + game.adjust1
-    game.rn2 = game.elo2 + game.adjust2
-
-    teams.loc[game.team1, 'Elo'] = game.rn1
-    teams.loc[game.team2, 'Elo'] = game.rn2
 
 def calculate_pairwise(teams, allTeams, df):
     # Create matrix containing: teams > opponents > WLT vs that opponent
@@ -334,30 +308,6 @@ def pairwise_tiebreakers(teams, opponentsMatrix):
     return teams
 
 
-def autocor(game):
-    if game.win1 == 1:
-        autocor = 2.2/(((game.elo1+game.home_coef)-game.elo2)*.001+2.2)
-    elif game.win2 == 1:
-        autocor = 2.2/((game.elo2-(game.elo1+game.home_coef))*.001+2.2)
-    else:
-        autocor = 1
-    return autocor
-
-def update_results(df, index, game):
-    df.loc[index, 'elo1'] = game.elo1
-    df.loc[index, 'elo2'] = game.elo2
-    df.loc[index, 'rn1'] = game.rn1
-    df.loc[index, 'rn2'] = game.rn2
-    df.loc[index, 'adjust1'] = game.adjust1
-    df.loc[index, 'adjust2'] = game.adjust2
-
-def update_results_nan(df, index, game):
-    df.loc[index, 'elo1'] = game.elo1
-    df.loc[index, 'elo2'] = game.elo2
-    df.loc[index, 'rn1'] = np.nan
-    df.loc[index, 'rn2'] = np.nan
-    df.loc[index, 'adjust1'] = np.nan
-    df.loc[index, 'adjust2'] = np.nan
 
 def format_adjustment(val):
     try:
@@ -532,6 +482,57 @@ class Game:
         except:
             self.win1 = np.nan
             self.win2 = np.nan
+
+    def set_elo(self, teams):
+        self.elo1 = teams.loc[self.team1, 'Elo']
+        self.elo2 = teams.loc[self.team2, 'Elo']
+
+    def _autocor(self):
+        if self.win1 == 1:
+            return 2.2/(((self.elo1+self.home_coef)-self.elo2)*.001+2.2)
+        elif self.win2 == 1:
+            return 2.2/((self.elo2-(self.elo1+self.home_coef))*.001+2.2)
+        else:
+            return 1
+
+    def calculate_elo(self, teams):
+        # Elo coefficients
+        k = 40
+        x = 2 if self.margin == 0 else 1
+        margin_coef = np.log(self.margin + x)
+        if self.neutral != 'Yes':
+            self.home_coef = 75
+
+        # Auto correlation coefficient
+        self.autocor = self._autocor()
+
+        rdiff = self.elo2 - (self.elo1 + self.home_coef)
+        we = 1/(10**(rdiff/400)+1)
+
+        self.adjust1 = k*margin_coef*self.autocor*(self.win1-we)
+        self.adjust2 = -1*self.adjust1
+
+        self.rn1 = self.elo1 + self.adjust1
+        self.rn2 = self.elo2 + self.adjust2
+
+        teams.loc[self.team1, 'Elo'] = self.rn1
+        teams.loc[self.team2, 'Elo'] = self.rn2
+
+    def update_results(self, df, index):
+        df.loc[index, 'elo1'] = self.elo1
+        df.loc[index, 'elo2'] = self.elo2
+        df.loc[index, 'rn1'] = self.rn1
+        df.loc[index, 'rn2'] = self.rn2
+        df.loc[index, 'adjust1'] = self.adjust1
+        df.loc[index, 'adjust2'] = self.adjust2
+
+    def update_results_nan(self, df, index):
+        df.loc[index, 'elo1'] = self.elo1
+        df.loc[index, 'elo2'] = self.elo2
+        df.loc[index, 'rn1'] = np.nan
+        df.loc[index, 'rn2'] = np.nan
+        df.loc[index, 'adjust1'] = np.nan
+        df.loc[index, 'adjust2'] = np.nan
 
 def main():
     # 15s
