@@ -2,6 +2,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 import pytz
 
+GAMES_MIN = 5
+CONNECTIVITY_MIN = 3
+
 
 def filter_games(df, start, end, upper=None):
     mask = (df['Date'] >= start) & (df['Date'] < end) & (df.Score1 >= 0) & (df.Score2 >= 0)
@@ -19,7 +22,7 @@ def qualify_teams(teams, df):
     # Remove teams with less than 5 games
     numGames2 = numGames.copy()
     for key, value in numGames.items():
-        if (value < 5):
+        if (value < GAMES_MIN):
             numGames2.pop(key)
     possible = numGames2
     # Find teams without enough Connectivity
@@ -41,8 +44,7 @@ def qualify_teams(teams, df):
                 possible[df['Team1'][index]] = possible[df['Team1'][index]] + 1
         possible2 = possible.copy()
         for key, value in possible.items():
-            # connectivity coefficient C=3
-            if (value >= 3):
+            if (value >= CONNECTIVITY_MIN):
                 newEligible.append(key)
                 possible2.pop(key)
         possible = possible2
