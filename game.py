@@ -10,7 +10,6 @@ class Game:
         self.score2 = score2
         self.neutral = neutral
         self.additional = additional
-        self.home_coef = 0
         self.calc_margin()
         self.calc_winloss()
 
@@ -38,37 +37,6 @@ class Game:
     def set_elo(self, teams):
         self.elo1 = teams.loc[self.team1, 'Elo']
         self.elo2 = teams.loc[self.team2, 'Elo']
-
-    def _autocor(self):
-        if self.win1 == 1:
-            return 2.2/(((self.elo1+self.home_coef)-self.elo2)*.001+2.2)
-        elif self.win2 == 1:
-            return 2.2/((self.elo2-(self.elo1+self.home_coef))*.001+2.2)
-        else:
-            return 1
-
-    def calculate_elo(self, teams):
-        # Elo coefficients
-        k = 40
-        x = 2 if self.margin == 0 else 1
-        margin_coef = np.log(self.margin + x)
-        if self.neutral != 'Yes':
-            self.home_coef = 75
-
-        # Auto correlation coefficient
-        self.autocor = self._autocor()
-
-        rdiff = self.elo2 - (self.elo1 + self.home_coef)
-        we = 1/(10**(rdiff/400)+1)
-
-        self.adjust1 = k*margin_coef*self.autocor*(self.win1-we)
-        self.adjust2 = -1*self.adjust1
-
-        self.rn1 = self.elo1 + self.adjust1
-        self.rn2 = self.elo2 + self.adjust2
-
-        teams.loc[self.team1, 'Elo'] = self.rn1
-        teams.loc[self.team2, 'Elo'] = self.rn2
 
     def update_results(self, df, index):
         df.loc[index, 'elo1'] = self.elo1
