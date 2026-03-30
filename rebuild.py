@@ -116,6 +116,9 @@ def load_results(df):
     return teams, df
 
 def rank_teams(teams, df, today, last_week_calculated):
+    # Work on a copy so mutations don't bleed back to the caller between calls
+    teams = teams.copy()
+    teams['Pairwise'] = 0
     # Modify df to limit rankings to this school year
     now = datetime.now()
     now = now.astimezone(pytz.timezone('US/Eastern'))
