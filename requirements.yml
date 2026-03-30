@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - python
+  - pytz
   - bs4
   - gspread
   - jinja2
