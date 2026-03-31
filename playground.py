@@ -5,6 +5,7 @@ Commands (each runs from that stage through to HTML generation):
   load   Download fresh data from Google Sheets, then run full pipeline
   rank   Run full pipeline from local CSVs (15s.csv / 7s.csv)
   site   Re-render HTML from saved state only (no recomputation)
+  eval   Evaluate Elo predictive accuracy (Brier score, accuracy, calibration)
 
 Examples:
   python playground.py rank
@@ -13,9 +14,15 @@ Examples:
   python playground.py rank --games-min 4 --conn-min 2
   python playground.py load
   python playground.py site
+  python playground.py eval
+  python playground.py eval --k 30 --home 60
+  python playground.py eval --skip-burnin
+  python playground.py eval --eval-after 2025-09-01
+  python playground.py eval --k 30 --eval-after 2025-09-01
 """
 import sys
 import argparse
+import numpy as np
 import pandas as pd
 import pytz
 import local_utils
@@ -23,7 +30,8 @@ from datetime import datetime, timedelta
 from site_generator import SiteGenerator
 from data import download_results, clean_results, format_results
 from pwr import qualify_teams, rank_teams
-from elo import init_teams, run_elo_loop, INELIGIBLE_ELO
+from elo import init_teams, run_elo_loop, calculate_elo, INELIGIBLE_ELO
+from game import Game
 import elo as elo_module
 import pwr as pwr_module
 
@@ -189,6 +197,171 @@ def cmd_site(args):
 
 
 # ---------------------------------------------------------------------------
+# Elo evaluation
+# ---------------------------------------------------------------------------
+
+def _eval_elo(df, teams):
+    """Replay the Elo loop, recording pre-game win probability vs actual outcome.
+
+    Returns a DataFrame with one row per completed game and columns:
+      date       - game date
+      p          - predicted win probability for team1 (pre-game)
+      outcome    - actual result for team1 (1 / 0 / 0.5)
+      home       - True if team1 was the home side
+      elo_diff   - team1 Elo minus team2 Elo (pre-game, ignoring home coef)
+      adjustment - magnitude of Elo adjustment (|adjust1|); tracks rating volatility
+
+    Games with no score (NaN margin) are excluded.
+    """
+    records = []
+    for index, row in df.iterrows():
+        game = Game(row.Team1, row.Score1, row.Team2, row.Score2, row.Neutral, row.Additional)
+        game.set_elo(teams)
+
+        if pd.isna(game.margin):
+            game.update_results_nan(df, index)
+            continue
+
+        home_coef = elo_module.HOME_ADVANTAGE if game.neutral != 'Yes' else 0
+        rdiff = game.elo2 - (game.elo1 + home_coef)
+        p = 1 / (10 ** (rdiff / 400) + 1)
+
+        calculate_elo(game, teams)
+        game.update_results(df, index)
+
+        records.append({
+            'date':       row.Date,
+            'p':          p,
+            'outcome':    game.win1,
+            'home':       game.neutral != 'Yes',
+            'elo_diff':   game.elo1 - game.elo2,
+            'adjustment': abs(game.adjust1),
+        })
+
+    return pd.DataFrame(records)
+
+
+def _detect_burnin(ev, window=20, threshold=0.10):
+    """Return the positional index of the first game after burn-in ends.
+
+    Tracks the rolling mean of Elo adjustment magnitude. Early games have
+    large adjustments as ratings correct from 1500; once the rolling mean
+    settles within `threshold` (e.g. 10%) of its long-run tail level, the
+    cold-start effect is considered over.
+
+    Returns 0 if there is not enough data to detect anything meaningful.
+    """
+    if len(ev) < window * 2:
+        return 0
+
+    rolling = ev['adjustment'].rolling(window, min_periods=window).mean()
+    long_run = rolling.dropna().iloc[-window:].mean()
+
+    for i, val in enumerate(rolling):
+        if pd.notna(val) and val <= long_run * (1 + threshold):
+            return i
+
+    return len(ev)
+
+
+def _print_eval(code, ev, n_excluded=0):
+    """Print Brier score, accuracy, log loss, and a calibration table."""
+    n_total = len(ev)
+    if n_total == 0:
+        print(f'[{code}] No games to evaluate after exclusions.')
+        return
+
+    brier     = ((ev['p'] - ev['outcome']) ** 2).mean()
+    p_clipped = ev['p'].clip(1e-7, 1 - 1e-7)
+    log_loss  = -(ev['outcome'] * np.log(p_clipped) +
+                  (1 - ev['outcome']) * np.log(1 - p_clipped)).mean()
+
+    decided = ev[ev['outcome'] != 0.5]
+    acc = (decided['p'].round() == decided['outcome']).mean() if len(decided) else float('nan')
+
+    excluded_note = f'  ({n_excluded} excluded)' if n_excluded else ''
+    print(f'\n[{code}] Evaluated {n_total} completed games ({len(decided)} decided){excluded_note}')
+    print(f'  Brier score  : {brier:.4f}  (random baseline: 0.2500)')
+    print(f'  Accuracy     : {acc:.1%}')
+    print(f'  Log loss     : {log_loss:.4f}')
+
+    # Calibration: bucket predictions into 10-pp bins from 50% up.
+    # Predictions below 50% are flipped so every row reads as
+    # "favourite win probability" for a symmetric, interpretable view.
+    fav_p       = ev['p'].where(ev['p'] >= 0.5, 1 - ev['p'])
+    fav_outcome = ev['outcome'].where(ev['p'] >= 0.5, 1 - ev['outcome'])
+
+    bins   = [0.50, 0.60, 0.70, 0.80, 0.90, 1.01]
+    labels = ['50-60%', '60-70%', '70-80%', '80-90%', '90-100%']
+    bucket = pd.cut(fav_p, bins=bins, labels=labels, right=False)
+
+    cal     = pd.DataFrame({'bucket': bucket, 'p': fav_p, 'outcome': fav_outcome})
+    grouped = cal.groupby('bucket', observed=True).agg(
+        predicted=('p', 'mean'),
+        actual=('outcome', 'mean'),
+        n=('p', 'count'),
+    )
+
+    print(f'\n  Calibration (favourite win probability):')
+    print(f'  {"Bin":<10}  {"Predicted":>10}  {"Actual":>8}  {"N":>5}')
+    print(f'  {"-"*10}  {"-"*10}  {"-"*8}  {"-"*5}')
+    for label, row in grouped.iterrows():
+        if row['n'] > 0:
+            print(f'  {label:<10}  {row["predicted"]:>9.1%}  {row["actual"]:>7.1%}  {int(row["n"]):>5}')
+    print()
+
+
+def cmd_eval(args):
+    """Evaluate Elo predictive accuracy.
+
+    All games are always fed through the Elo loop so that ratings warm up
+    correctly from the 1500 starting point.  Exclusion flags only affect
+    which games count toward the reported metrics:
+
+      --eval-after DATE   Only score games on/after DATE.  Use this to hold
+                          out a season you did not tune K/home on, giving a
+                          clean train/test split.  Tune on an earlier window,
+                          then run --eval-after on a later one you never tuned.
+
+      --skip-burnin       Auto-detect the cold-start period (games where Elo
+                          adjustments are still large) and exclude it.  The
+                          detection window/threshold can be tuned with
+                          --burnin-window and --burnin-threshold.
+    """
+    _override_constants(args)
+    for code in CODES:
+        print(f'[{code}] Loading {code}.csv...')
+        df = pd.read_csv(f'{code}.csv')
+        df = clean_results(df)
+
+        if args.date:
+            df = df[df['Date'].dt.strftime("%Y-%m-%d") <= args.date].copy()
+            print(f'[{code}] Cutoff: {args.date} ({len(df)} games)')
+
+        teams = _prepare_teams(df, init_teams(df))
+        ev    = _eval_elo(df, teams)      # always runs full history
+
+        # --- apply exclusions (metrics only; ratings were already computed) ---
+        n_before = len(ev)
+
+        if args.skip_burnin:
+            burnin_idx = _detect_burnin(ev, args.burnin_window, args.burnin_threshold)
+            if burnin_idx > 0:
+                print(f'[{code}] Burn-in detected: skipping first {burnin_idx} games '
+                      f'(game {burnin_idx + 1} onward evaluated)')
+            ev = ev.iloc[burnin_idx:].reset_index(drop=True)
+
+        if args.eval_after:
+            cutoff = pd.Timestamp(args.eval_after)
+            ev = ev[pd.to_datetime(ev['date']) >= cutoff].reset_index(drop=True)
+
+        n_excluded = n_before - len(ev)
+        _print_eval(code, ev, n_excluded=n_excluded)
+
+    print('Done.')
+
+
+# ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
 
@@ -227,6 +400,31 @@ def main():
     p_site.add_argument('--date', metavar='YYYY-MM-DD',
                         help='Reference date for "recent games" window (defaults to today)')
     p_site.set_defaults(func=cmd_site)
+
+    p_eval = sub.add_parser('eval', help='Evaluate Elo predictive accuracy from local CSVs')
+    p_eval.add_argument('--date', metavar='YYYY-MM-DD',
+                        help='Only include games on or before this date (hard cutoff on input)')
+    p_eval.add_argument('--k', type=int, metavar='N',
+                        help=f'ELO K-factor (default: {elo_module.ELO_K})')
+    p_eval.add_argument('--home', type=int, metavar='N',
+                        help=f'Home advantage in rating points (default: {elo_module.HOME_ADVANTAGE})')
+    p_eval.add_argument('--eval-after', metavar='YYYY-MM-DD', dest='eval_after',
+                        help='Only score games on/after this date (ratings still warm up from game 1). '
+                             'Use as a test-set boundary: tune --k/--home on an earlier window, '
+                             'then evaluate here on a period you never tuned on.')
+    p_eval.add_argument('--skip-burnin', action='store_true', dest='skip_burnin',
+                        help='Auto-detect cold-start period and exclude those games from metrics')
+    p_eval.add_argument('--burnin-window', type=int, default=20, dest='burnin_window', metavar='N',
+                        help='Rolling window size for burn-in detection (default: 20)')
+    p_eval.add_argument('--burnin-threshold', type=float, default=0.10, dest='burnin_threshold',
+                        metavar='F',
+                        help='Fraction above long-run mean that counts as still burning in '
+                             '(default: 0.10)')
+    p_eval.add_argument('--games-min', type=int, dest='games_min', metavar='N',
+                        help=argparse.SUPPRESS)
+    p_eval.add_argument('--conn-min', type=int, dest='conn_min', metavar='N',
+                        help=argparse.SUPPRESS)
+    p_eval.set_defaults(func=cmd_eval)
 
     args = parser.parse_args()
     args.func(args)
