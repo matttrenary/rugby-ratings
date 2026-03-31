@@ -13,6 +13,8 @@ Teams.csv
 /venv
 # Random support files
 support/
+# Playground state files
+_pg_*.csv
 # Random other stuff
 .DS_Store
 __pycache__/

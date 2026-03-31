@@ -160,10 +160,10 @@ def pairwise_tiebreakers(teams, opponentsMatrix):
     return teams
 
 
-def rank_teams(teams, df, today, last_week_calculated):
+def rank_teams(teams, df, today, last_week_calculated, now=None):
     # Modify df to limit rankings to this school year
-    now = datetime.now()
-    now = now.astimezone(pytz.timezone('US/Eastern'))
+    if now is None:
+        now = datetime.now().astimezone(pytz.timezone('US/Eastern'))
     if today < '07-01':
         # backYear and backCutoff assist with disqualifying idle teams
         backYear = int(now.strftime("%Y")) - 2

@@ -24,20 +24,23 @@ def replace_element(html, element_type, id, new_html):
 
     return str(soup)
 
-def load_range(df, days_num_back, days_num_forward):
+def load_range(df, days_num_back, days_num_forward, now=None):
     """Filters dataframe, pulling only the games within specified days back
 
     Args:
         df: The dataframe of games
         days: The number of days back to include
+        now: Reference date (defaults to today)
 
     Returns:
         DataFrame with subset of games
     """
 
     # Arrange date objects
-    days_ago = datetime.now(pytz.timezone('America/New_York')).date() - timedelta(days=days_num_back)
-    days_ahead = datetime.now(pytz.timezone('America/New_York')).date() + timedelta(days=days_num_forward)
+    if now is None:
+        now = datetime.now(pytz.timezone('America/New_York'))
+    days_ago = now.date() - timedelta(days=days_num_back)
+    days_ahead = now.date() + timedelta(days=days_num_forward)
     df['Date'] = pd.to_datetime(df['Date'], format='mixed').dt.date
     
     # Filter df to our subset of games
