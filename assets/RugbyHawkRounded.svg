@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 515.5 515.24">
   <defs>
     <clipPath id="rounded-corners">
-      <rect width="100%" height="100%" rx="110" ry="110"/>
+      <rect width="100%" height="100%" rx="105" ry="105"/>
     </clipPath>
   </defs>
   <g clip-path="url(#rounded-corners)">
